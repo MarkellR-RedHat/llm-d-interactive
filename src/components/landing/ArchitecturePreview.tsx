@@ -3,7 +3,7 @@ import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const components = [
-  { id: 'gateway', label: 'API Gateway', x: 50, y: 8, color: '#EE0000',
+  { id: 'gateway', label: 'API Gateway', x: 50, y: 8, color: '#9b4d9b',
     description: 'Receives incoming inference requests and forwards them to the scheduler for routing decisions.' },
   { id: 'scheduler', label: 'Scheduler', x: 50, y: 28, color: '#0066CC',
     description: 'Evaluates each request against the active routing policy and selects the best backend worker.' },
@@ -62,7 +62,7 @@ export default function ArchitecturePreview() {
                     <line
                       key={`${conn.from}-${conn.to}`}
                       x1={from.x} y1={from.y + 6} x2={to.x} y2={to.y - 6}
-                      stroke={lit ? '#EE0000' : '#D2D2D2'}
+                      stroke={lit ? '#9b4d9b' : '#D2D2D2'}
                       strokeWidth={lit ? 0.4 : 0.2}
                       strokeDasharray={lit ? '' : '1.5 1.5'}
                     />
@@ -144,7 +144,7 @@ export default function ArchitecturePreview() {
                   style={{
                     display: 'inline-block',
                     padding: '14px 24px',
-                    backgroundColor: '#EE0000',
+                    backgroundColor: '#9b4d9b',
                     color: '#fff',
                     fontFamily: 'var(--font-display)',
                     fontWeight: 700,
@@ -155,8 +155,8 @@ export default function ArchitecturePreview() {
                     transition: 'background 0.5s ease',
                     letterSpacing: '0.03em',
                   }}
-                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#A30000')}
-                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#7f317f')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#9b4d9b')}
                 >
                   Open Architecture Explorer
                 </Link>

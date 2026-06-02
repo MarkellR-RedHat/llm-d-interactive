@@ -143,7 +143,7 @@ export default function FeaturesSection() {
                   style={{
                     width: '36px',
                     height: '36px',
-                    color: '#EE0000',
+                    color: '#9b4d9b',
                     marginBottom: '24px',
                     display: 'inline-block',
                   }}

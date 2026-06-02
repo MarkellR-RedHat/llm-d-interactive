@@ -35,24 +35,16 @@ function findRelevantDocs(query: string, topN = 5): DocChunk[] {
   return scored.slice(0, topN).filter((s) => s.score > 0).map((s) => s.chunk)
 }
 
-/* ─── API key management ─── */
+/* ─── API key helpers ─── */
 
 const STORAGE_KEY = 'llmd-groq-api-key'
 
 function getStoredApiKey(): string {
-  try {
-    return localStorage.getItem(STORAGE_KEY) || ''
-  } catch {
-    return ''
-  }
+  try { return localStorage.getItem(STORAGE_KEY) || '' } catch { return '' }
 }
 
 function storeApiKey(key: string) {
-  try {
-    localStorage.setItem(STORAGE_KEY, key)
-  } catch {
-    // localStorage unavailable
-  }
+  try { localStorage.setItem(STORAGE_KEY, key) } catch { /* noop */ }
 }
 
 /* ─── API call ─── */
@@ -122,27 +114,14 @@ export default function DocChatbot() {
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
-  const [apiKey, setApiKey] = useState(() => {
-    const envKey = import.meta.env.VITE_GROQ_API_KEY as string | undefined
-    return envKey || getStoredApiKey()
-  })
+  const [apiKey, setApiKey] = useState(getStoredApiKey)
   const [apiKeyInput, setApiKeyInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
-
   const hasApiKey = apiKey.length > 0
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, isLoading])
-
-  function handleSaveApiKey() {
-    const trimmed = apiKeyInput.trim()
-    if (trimmed) {
-      setApiKey(trimmed)
-      storeApiKey(trimmed)
-      setApiKeyInput('')
-    }
-  }
 
   async function handleSend(e?: FormEvent) {
     e?.preventDefault()
@@ -184,7 +163,7 @@ export default function DocChatbot() {
     width: '56px',
     height: '56px',
     borderRadius: '50%',
-    backgroundColor: '#EE0000',
+    backgroundColor: '#9b4d9b',
     border: 'none',
     cursor: 'pointer',
     display: 'flex',
@@ -294,57 +273,46 @@ export default function DocChatbot() {
             </button>
           </div>
 
-          {/* API key input (if no key set) */}
+          {/* API key input banner */}
           {!hasApiKey && (
-            <div
-              style={{
-                padding: '12px 20px',
-                backgroundColor: '#FFFDE7',
-                borderBottom: '1px solid #E0E0E0',
-                fontSize: '13px',
-                color: '#333',
-              }}
-            >
-              <div style={{ marginBottom: '8px' }}>
-                Enter your free Groq API key to enable the chatbot.{' '}
-                <a
-                  href="https://console.groq.com"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ color: '#EE0000', textDecoration: 'underline' }}
-                >
-                  Get a free key at console.groq.com
-                </a>
+            <div style={{ padding: '12px 16px', backgroundColor: '#FFF8E1', borderBottom: '1px solid #FFE082', flexShrink: 0 }}>
+              <div style={{ fontSize: '13px', color: '#5D4037', marginBottom: '8px', lineHeight: '18px' }}>
+                Enter your free Groq API key to use the assistant.
+                Get one at <a href="https://console.groq.com" target="_blank" rel="noopener noreferrer" style={{ color: '#9b4d9b', fontWeight: 600 }}>console.groq.com</a>
               </div>
               <div style={{ display: 'flex', gap: '8px' }}>
                 <input
                   type="password"
                   value={apiKeyInput}
-                  onChange={(e) => setApiKeyInput(e.target.value)}
+                  onChange={e => setApiKeyInput(e.target.value)}
                   placeholder="gsk_..."
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') handleSaveApiKey()
-                  }}
                   style={{
                     flex: 1,
-                    padding: '6px 10px',
-                    border: '1px solid #CCC',
-                    borderRadius: '4px',
+                    padding: '8px 10px',
+                    border: '1px solid #D0D0D0',
+                    borderRadius: '6px',
                     fontSize: '13px',
-                    fontFamily: 'var(--font-body)',
+                    fontFamily: 'var(--font-mono)',
+                    outline: 'none',
                   }}
                 />
                 <button
-                  onClick={handleSaveApiKey}
+                  onClick={() => {
+                    if (apiKeyInput.trim()) {
+                      storeApiKey(apiKeyInput.trim())
+                      setApiKey(apiKeyInput.trim())
+                      setApiKeyInput('')
+                    }
+                  }}
                   style={{
-                    padding: '6px 14px',
-                    backgroundColor: '#EE0000',
+                    padding: '8px 16px',
+                    backgroundColor: '#9b4d9b',
                     color: '#fff',
                     border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
+                    borderRadius: '6px',
                     fontSize: '13px',
                     fontWeight: 600,
+                    cursor: 'pointer',
                   }}
                 >
                   Save
@@ -434,13 +402,13 @@ export default function DocChatbot() {
             {error && (
               <div
                 style={{
-                  backgroundColor: '#FFF0F0',
-                  border: '1px solid #FFCCCC',
+                  backgroundColor: '#f3e8f3',
+                  border: '1px solid #d4a8d4',
                   padding: '10px 14px',
                   borderRadius: '8px',
                   fontSize: '13px',
                   lineHeight: '20px',
-                  color: '#CC0000',
+                  color: '#7f317f',
                 }}
               >
                 {error}
@@ -456,8 +424,8 @@ export default function DocChatbot() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={hasApiKey ? 'Ask about llm-d...' : 'Enter your API key above first'}
-              disabled={!hasApiKey || isLoading}
+              placeholder="Ask about llm-d..."
+              disabled={isLoading || !hasApiKey}
               rows={1}
               style={{
                 flex: 1,
@@ -471,7 +439,7 @@ export default function DocChatbot() {
                 lineHeight: '20px',
                 maxHeight: '80px',
                 overflowY: 'auto',
-                backgroundColor: hasApiKey ? '#fff' : '#F5F5F5',
+                backgroundColor: '#fff',
               }}
             />
             <button
@@ -481,7 +449,7 @@ export default function DocChatbot() {
                 width: '40px',
                 height: '40px',
                 borderRadius: '8px',
-                backgroundColor: !input.trim() || isLoading || !hasApiKey ? '#CCC' : '#EE0000',
+                backgroundColor: !input.trim() || isLoading || !hasApiKey ? '#CCC' : '#9b4d9b',
                 border: 'none',
                 cursor: !input.trim() || isLoading || !hasApiKey ? 'default' : 'pointer',
                 display: 'flex',

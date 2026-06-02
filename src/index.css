@@ -1,19 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  --color-rh-red: #EE0000;
-  --color-rh-red-dark: #A30000;
-  --color-rh-red-light: #FF4D4D;
-  --color-rh-red-50: #FFF0F0;
-  --color-rh-red-100: #FFD6D6;
-  --color-rh-red-200: #FFAAAA;
-  --color-rh-red-300: #FF7A7A;
-  --color-rh-red-400: #FF4D4D;
-  --color-rh-red-500: #EE0000;
-  --color-rh-red-600: #CC0000;
-  --color-rh-red-700: #A30000;
-  --color-rh-red-800: #7D0000;
-  --color-rh-red-900: #570000;
+  --color-rh-red: #9b4d9b;
+  --color-rh-red-dark: #7f317f;
+  --color-rh-red-light: #b570b5;
+  --color-rh-red-50: #f3e8f3;
+  --color-rh-red-100: #e6d0e6;
+  --color-rh-red-200: #d4a8d4;
+  --color-rh-red-300: #c280c2;
+  --color-rh-red-400: #b570b5;
+  --color-rh-red-500: #9b4d9b;
+  --color-rh-red-600: #8a3f8a;
+  --color-rh-red-700: #7f317f;
+  --color-rh-red-800: #6a2469;
+  --color-rh-red-900: #4a1a4a;
 
   --color-rh-black: #151515;
   --color-rh-gray-900: #1F1F1F;
@@ -109,8 +109,8 @@ a {
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 20px rgba(238, 0, 0, 0.2); }
-  50% { box-shadow: 0 0 40px rgba(238, 0, 0, 0.4); }
+  0%, 100% { box-shadow: 0 0 20px rgba(155, 77, 155, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(155, 77, 155, 0.4); }
 }
 
 .animate-float { animation: float 6s ease-in-out infinite; }
@@ -137,7 +137,7 @@ a {
 
 .bg-mesh {
   background:
-    radial-gradient(at 20% 20%, rgba(238, 0, 0, 0.08) 0px, transparent 50%),
+    radial-gradient(at 20% 20%, rgba(155, 77, 155, 0.08) 0px, transparent 50%),
     radial-gradient(at 80% 40%, rgba(0, 102, 204, 0.05) 0px, transparent 50%),
     radial-gradient(at 50% 80%, rgba(94, 64, 190, 0.05) 0px, transparent 50%);
 }

@@ -95,7 +95,7 @@ export default function HeroSection() {
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
-            ctx.strokeStyle = `rgba(200, 50, 50, ${alpha})`
+            ctx.strokeStyle = `rgba(155, 77, 155, ${alpha})`
             ctx.lineWidth = 0.7
             ctx.stroke()
           }
@@ -103,7 +103,7 @@ export default function HeroSection() {
 
         ctx.beginPath()
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(210, 60, 60, 0.4)'
+        ctx.fillStyle = 'rgba(170, 90, 170, 0.4)'
         ctx.fill()
       }
 
@@ -199,7 +199,7 @@ export default function HeroSection() {
             style={{
               display: 'inline-block',
               padding: '14px 24px',
-              backgroundColor: '#EE0000',
+              backgroundColor: '#9b4d9b',
               color: '#fff',
               fontFamily: 'var(--font-display)',
               fontWeight: 700,
@@ -212,8 +212,8 @@ export default function HeroSection() {
               position: 'relative',
               zIndex: 20,
             }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#A30000')}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#7f317f')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#9b4d9b')}
           >
             Start Learning
           </Link>

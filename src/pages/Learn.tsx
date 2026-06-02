@@ -869,7 +869,7 @@ export default function Learn() {
               style={{
                 display: 'inline-block',
                 padding: '6px 14px',
-                backgroundColor: '#EE0000',
+                backgroundColor: '#9b4d9b',
                 color: '#fff',
                 fontFamily: 'var(--font-display)',
                 fontWeight: 700,
@@ -945,12 +945,12 @@ export default function Learn() {
                   fontFamily: 'var(--font-display)',
                   fontWeight: activeTab === tab.id ? 700 : 500,
                   fontSize: '15px',
-                  color: activeTab === tab.id ? '#EE0000' : '#4D4D4D',
+                  color: activeTab === tab.id ? '#9b4d9b' : '#4D4D4D',
                   backgroundColor: 'transparent',
                   border: 'none',
                   borderBottom:
                     activeTab === tab.id
-                      ? '3px solid #EE0000'
+                      ? '3px solid #9b4d9b'
                       : '3px solid transparent',
                   cursor: 'pointer',
                   whiteSpace: 'nowrap',

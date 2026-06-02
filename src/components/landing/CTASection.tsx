@@ -41,28 +41,7 @@ export default function CTASection() {
               paddingTop: '8px',
             }}
           >
-            <div
-              style={{
-                width: '80px',
-                height: '80px',
-                backgroundColor: '#EE0000',
-                borderRadius: '12px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                style={{
-                  color: '#fff',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: '36px',
-                }}
-              >
-                d
-              </span>
-            </div>
+            <img src="/llm-d-interactive/llm-d-icon.png" alt="llm-d" style={{ width: '80px', height: '80px' }} />
           </div>
 
           {/* Right: content */}
@@ -147,7 +126,7 @@ export default function CTASection() {
                         to={item.path}
                         style={linkStyles}
                         onMouseEnter={e => {
-                          e.currentTarget.style.borderColor = '#EE0000'
+                          e.currentTarget.style.borderColor = '#9b4d9b'
                           e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'
                         }}
                         onMouseLeave={e => {
@@ -164,7 +143,7 @@ export default function CTASection() {
                         rel="noopener noreferrer"
                         style={linkStyles}
                         onMouseEnter={e => {
-                          e.currentTarget.style.borderColor = '#EE0000'
+                          e.currentTarget.style.borderColor = '#9b4d9b'
                           e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)'
                         }}
                         onMouseLeave={e => {

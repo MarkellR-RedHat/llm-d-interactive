@@ -11,7 +11,7 @@ interface InteractiveFlowProps {
   color?: string
 }
 
-export default function InteractiveFlow({ steps, color = '#EE0000' }: InteractiveFlowProps) {
+export default function InteractiveFlow({ steps, color = '#9b4d9b' }: InteractiveFlowProps) {
   const [activeStep, setActiveStep] = useState<number | null>(null)
 
   return (

@@ -293,7 +293,7 @@ export default function Notebooks() {
                 fontSize: '13px',
                 letterSpacing: '0.08em',
                 textTransform: 'uppercase' as const,
-                color: '#EE0000',
+                color: '#9b4d9b',
                 marginBottom: '16px',
               }}
             >

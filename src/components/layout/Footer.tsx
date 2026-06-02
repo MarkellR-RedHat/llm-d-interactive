@@ -54,28 +54,7 @@ export default function Footer() {
         {/* Logo / info on left */}
         <div style={{ flex: '0 0 280px', maxWidth: '280px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
-            <div
-              style={{
-                width: '40px',
-                height: '40px',
-                backgroundColor: '#EE0000',
-                borderRadius: '8px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              <span
-                style={{
-                  color: '#fff',
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 800,
-                  fontSize: '18px',
-                }}
-              >
-                d
-              </span>
-            </div>
+            <img src="/llm-d-interactive/llm-d-icon.png" alt="llm-d" style={{ width: '36px', height: '36px' }} />
             <span
               style={{
                 fontFamily: 'var(--font-display)',

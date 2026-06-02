@@ -67,28 +67,7 @@ export default function Navbar() {
         }}
       >
         <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
-          <div
-            style={{
-              width: '40px',
-              height: '40px',
-              backgroundColor: '#EE0000',
-              borderRadius: '8px',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}
-          >
-            <span
-              style={{
-                color: '#fff',
-                fontFamily: 'var(--font-display)',
-                fontWeight: 800,
-                fontSize: '18px',
-              }}
-            >
-              d
-            </span>
-          </div>
+          <img src="/llm-d-interactive/llm-d-icon.png" alt="llm-d" style={{ width: '36px', height: '36px' }} />
           <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
             <span
               style={{
@@ -187,7 +166,7 @@ export default function Navbar() {
                     fontSize: '15px',
                     fontWeight: 600,
                     fontFamily: 'var(--font-body)',
-                    color: openDropdown === item.label ? '#EE0000' : '#3C3F42',
+                    color: openDropdown === item.label ? '#9b4d9b' : '#3C3F42',
                     background: 'none',
                     border: 'none',
                     cursor: 'pointer',
@@ -225,7 +204,7 @@ export default function Navbar() {
                             padding: '14px 20px',
                             textDecoration: 'none',
                             borderBottom: '1px solid #F0F0F0',
-                            backgroundColor: isActive(child.path) ? '#FFF0F0' : 'transparent',
+                            backgroundColor: isActive(child.path) ? '#f3e8f3' : 'transparent',
                             transition: 'background-color 0.2s ease',
                           }}
                           onMouseEnter={(e) => {
@@ -239,7 +218,7 @@ export default function Navbar() {
                             style={{
                               fontSize: '14px',
                               fontWeight: 600,
-                              color: isActive(child.path) ? '#EE0000' : '#151515',
+                              color: isActive(child.path) ? '#9b4d9b' : '#151515',
                               marginBottom: '3px',
                             }}
                           >
@@ -270,9 +249,9 @@ export default function Navbar() {
                   fontSize: '15px',
                   fontWeight: 600,
                   fontFamily: 'var(--font-body)',
-                  color: isActive(item.path!) ? '#EE0000' : '#3C3F42',
+                  color: isActive(item.path!) ? '#9b4d9b' : '#3C3F42',
                   textDecoration: 'none',
-                  borderBottom: isActive(item.path!) ? '3px solid #EE0000' : '3px solid transparent',
+                  borderBottom: isActive(item.path!) ? '3px solid #9b4d9b' : '3px solid transparent',
                   transition: 'color 0.3s ease',
                 }}
               >
@@ -324,9 +303,9 @@ export default function Navbar() {
                           padding: '10px 12px',
                           fontSize: '15px',
                           fontWeight: isActive(child.path) ? 600 : 400,
-                          color: isActive(child.path) ? '#EE0000' : '#3C3F42',
+                          color: isActive(child.path) ? '#9b4d9b' : '#3C3F42',
                           textDecoration: 'none',
-                          backgroundColor: isActive(child.path) ? '#FFF0F0' : 'transparent',
+                          backgroundColor: isActive(child.path) ? '#f3e8f3' : 'transparent',
                           borderRadius: '4px',
                         }}
                       >
@@ -344,9 +323,9 @@ export default function Navbar() {
                       padding: '10px 12px',
                       fontSize: '15px',
                       fontWeight: isActive(item.path!) ? 600 : 400,
-                      color: isActive(item.path!) ? '#EE0000' : '#3C3F42',
+                      color: isActive(item.path!) ? '#9b4d9b' : '#3C3F42',
                       textDecoration: 'none',
-                      backgroundColor: isActive(item.path!) ? '#FFF0F0' : 'transparent',
+                      backgroundColor: isActive(item.path!) ? '#f3e8f3' : 'transparent',
                       borderRadius: '4px',
                     }}
                   >

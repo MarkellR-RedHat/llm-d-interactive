@@ -29,12 +29,12 @@ export default function Term({ children, definition }: TermProps) {
       <span
         onClick={() => setOpen(!open)}
         style={{
-          borderBottom: '1.5px dotted #EE0000',
+          borderBottom: '1.5px dotted #9b4d9b',
           cursor: 'pointer',
           color: 'inherit',
           transition: 'color 0.15s',
         }}
-        onMouseEnter={e => (e.currentTarget.style.color = '#EE0000')}
+        onMouseEnter={e => (e.currentTarget.style.color = '#9b4d9b')}
         onMouseLeave={e => (e.currentTarget.style.color = 'inherit')}
       >
         {children}
@@ -57,7 +57,7 @@ export default function Term({ children, definition }: TermProps) {
             boxShadow: '0 8px 30px rgba(0,0,0,0.2)',
           }}
         >
-          <div style={{ fontWeight: 700, fontSize: '13px', color: '#EE0000', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+          <div style={{ fontWeight: 700, fontSize: '13px', color: '#9b4d9b', marginBottom: '8px', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
             Definition
           </div>
           {definition}
