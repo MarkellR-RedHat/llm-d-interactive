@@ -13,7 +13,7 @@ export default function Learn() {
             <span className="text-sm font-medium text-rh-red">Learning Center</span>
           </div>
           <h1 className="font-display font-extrabold text-4xl lg:text-5xl text-rh-black mb-8 leading-tight">
-            What is llm-d?
+            What is llm‑d?
           </h1>
           <p className="text-rh-gray-600 text-lg max-w-2xl leading-relaxed">
             From first principles to production deployment. Learn at your own pace,

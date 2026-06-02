@@ -16,7 +16,7 @@ export default function Notebooks() {
             Jupyter Notebooks
           </h1>
           <p className="text-rh-gray-600 text-lg max-w-2xl leading-relaxed">
-            Learn by doing. These interactive notebooks walk you through real llm-d
+            Learn by doing. These interactive notebooks walk you through real llm‑d
             workflows, from basic setup to advanced routing and autoscaling configuration.
             Run them locally or in your preferred Jupyter environment.
           </p>

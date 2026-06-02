@@ -85,7 +85,7 @@ export default function Footer() {
                 letterSpacing: '-0.01em',
               }}
             >
-              llm-d
+              llm‑d
             </span>
           </div>
           <p style={{ fontSize: '14px', color: '#8A8D90', lineHeight: '22px' }}>
@@ -215,7 +215,7 @@ export default function Footer() {
         </div>
 
         <p style={{ fontSize: '13px', color: '#6A6E73' }}>
-          llm-d is an open source project. Apache License 2.0.
+          llm‑d is an open source project. Apache License 2.0.
         </p>
       </div>
 

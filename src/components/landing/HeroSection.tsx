@@ -27,7 +27,7 @@ export default function HeroSection() {
     resize()
     window.addEventListener('resize', resize)
 
-    const count = 80
+    const count = 150
     const nodes: { x: number; y: number; vx: number; vy: number; r: number }[] = []
     for (let i = 0; i < count; i++) {
       nodes.push({
@@ -163,7 +163,7 @@ export default function HeroSection() {
             maxWidth: '900px',
           }}
         >
-          Learn how to serve large language models with llm-d
+          Learn how to serve large language models with <span style={{whiteSpace: 'nowrap'}}>llm-d</span>
         </motion.h1>
 
         <motion.p

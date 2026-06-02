@@ -16,7 +16,7 @@ export default function Architecture() {
             Architecture Explorer
           </h1>
           <p className="text-rh-gray-600 text-lg max-w-2xl leading-relaxed">
-            Interactive diagram of every llm-d component. Click through to understand
+            Interactive diagram of every llm‑d component. Click through to understand
             what each piece does, how to configure it, and what breaks when it fails.
           </p>
 

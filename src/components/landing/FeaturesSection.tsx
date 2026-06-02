@@ -16,7 +16,7 @@ const items = [
   {
     icon: BookOpen,
     title: 'Learning Center',
-    desc: 'Understand what llm-d is, how disaggregated inference works, and why it matters for serving LLMs at scale.',
+    desc: 'Understand what llm‑d is, how disaggregated inference works, and why it matters for serving LLMs at scale.',
     path: '/learn',
   },
   {
@@ -40,13 +40,13 @@ const items = [
   {
     icon: FlaskConical,
     title: 'Jupyter Notebooks',
-    desc: 'Hands-on tutorials that walk you through real llm-d deployments, routing experiments, and tuning.',
+    desc: 'Hands-on tutorials that walk you through real llm‑d deployments, routing experiments, and tuning.',
     path: '/notebooks',
   },
   {
     icon: Layers3,
     title: 'Architecture Explorer',
-    desc: 'Interactive diagram of every component in llm-d. Click through to understand what each piece does.',
+    desc: 'Interactive diagram of every component in llm‑d. Click through to understand what each piece does.',
     path: '/architecture',
   },
   {
@@ -90,7 +90,7 @@ export default function FeaturesSection() {
             Guides &amp; Tools
           </h2>
           <p style={{ fontSize: '18px', color: '#4D4D4D', lineHeight: '28px', maxWidth: '540px', margin: '0 auto' }}>
-            Everything you need to understand, configure, and operate llm-d.
+            Everything you need to understand, configure, and operate llm‑d.
           </p>
         </motion.div>
 

@@ -109,10 +109,10 @@ export default function ArchitecturePreview() {
                 marginBottom: '20px',
               }}
             >
-              How llm-d works
+              How llm‑d works
             </h2>
             <p style={{ fontSize: '18px', color: '#4D4D4D', lineHeight: '28px', marginBottom: '40px', maxWidth: '560px' }}>
-              llm-d separates prefill and decode into independent workers that scale separately,
+              llm‑d separates prefill and decode into independent workers that scale separately,
               connected through a shared KV cache. Hover over each component to learn more.
             </p>
 

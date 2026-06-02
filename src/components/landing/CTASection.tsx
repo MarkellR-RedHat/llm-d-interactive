@@ -89,7 +89,7 @@ export default function CTASection() {
               }}
             >
               Whether you are just starting out or looking for something specific,
-              these resources will help you get the most out of llm-d.
+              these resources will help you get the most out of <span style={{whiteSpace: 'nowrap'}}>llm-d.</span>
             </p>
 
             {/* Links as a clean flex list */}
