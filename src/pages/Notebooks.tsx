@@ -21,85 +21,118 @@ const categories: Category[] = [
       {
         title: 'Your First llm‑d Deployment',
         description:
-          'Set up a basic llm‑d cluster on minikube and serve a small model.',
+          'Follow the Optimized Baseline well-lit path to deploy Qwen3-32B with prefix-cache and load-aware routing on 16 GPUs.',
         difficulty: 'Beginner',
-        time: '30 min',
+        time: '45 min',
       },
       {
-        title: 'Understanding the Router',
+        title: 'Sending Your First Requests',
         description:
-          'Send requests and observe how the router distributes them across replicas.',
+          'Use the OpenAI-compatible API to send chat completions, explore response formats, and monitor basic metrics.',
         difficulty: 'Beginner',
         time: '20 min',
       },
       {
-        title: 'Exploring the API',
+        title: 'Understanding the Router Dashboard',
         description:
-          'Walk through the OpenAI‑compatible API endpoints and response formats.',
+          'Set up Grafana with the llm‑d dashboard recipes, monitor queue depth, cache hit rates, and per-replica metrics in real time.',
         difficulty: 'Beginner',
-        time: '15 min',
+        time: '30 min',
       },
     ],
   },
   {
-    heading: 'Routing Deep Dive',
+    heading: 'Well-Lit Paths: Intelligent Routing',
     notebooks: [
       {
-        title: 'Prefix‑Cache Routing vs Round‑Robin',
+        title: 'Optimized Baseline: Prefix-Cache and Load-Aware Routing',
         description:
-          'Run the same workload under both policies and compare throughput and TTFT.',
+          'Deploy the recommended baseline configuration with prefix-cache-scorer and load-aware scoring. Compare throughput and TTFT against raw round-robin.',
         difficulty: 'Intermediate',
         time: '45 min',
       },
       {
-        title: 'Load‑Aware Routing Under Burst Traffic',
+        title: 'Precise Prefix Cache Routing',
         description:
-          'Simulate bursty traffic patterns and observe how load‑aware routing prevents hotspots.',
+          'Enable event-driven KV-cache indexing via ZMQ for exact block-level cache scoring instead of heuristic estimation. Measure the improvement on multi-turn workloads.',
         difficulty: 'Intermediate',
-        time: '30 min',
+        time: '60 min',
       },
       {
-        title: 'Predicted Latency Scheduling',
+        title: 'Predicted Latency-Based Routing',
         description:
-          'Train the XGBoost latency predictor on live traffic and measure the improvement.',
+          'Train the XGBoost latency predictor on live traffic and route requests to the replica predicted to serve them fastest. Compare against heuristic routing on mixed workloads.',
         difficulty: 'Advanced',
         time: '60 min',
       },
     ],
   },
   {
-    heading: 'Infrastructure',
-    notebooks: [
-      {
-        title: 'KV Cache Hierarchy Exploration',
-        description:
-          'Configure GPU, CPU, and disk tiers and observe cache hit rates under different workloads.',
-        difficulty: 'Intermediate',
-        time: '45 min',
-      },
-      {
-        title: 'Autoscaling with SLO Targets',
-        description:
-          'Define latency SLOs and watch the autoscaler add and remove workers.',
-        difficulty: 'Intermediate',
-        time: '40 min',
-      },
-    ],
-  },
-  {
-    heading: 'Advanced Topics',
+    heading: 'Well-Lit Paths: Serving at Scale',
     notebooks: [
       {
         title: 'Prefill/Decode Disaggregation',
         description:
-          'Deploy separate prefill and decode workers and benchmark against a unified setup.',
+          'Deploy gpt-oss-120b with 8 TP=1 prefill and 2 TP=4 decode workers. Measure throughput per GPU improvement and ITL reduction.',
+        difficulty: 'Advanced',
+        time: '75 min',
+      },
+      {
+        title: 'Tiered Prefix Cache: CPU and Disk Offloading',
+        description:
+          'Configure hierarchical KV cache offloading (GPU to CPU to disk) and measure effective cache capacity expansion on multi-turn workloads.',
+        difficulty: 'Intermediate',
+        time: '60 min',
+      },
+      {
+        title: 'Wide Expert-Parallelism for DeepSeek-R1',
+        description:
+          'Deploy DeepSeek-R1 across multiple nodes using LeaderWorkerSet with combined DP/EP configuration.',
+        difficulty: 'Advanced',
+        time: '90 min',
+      },
+    ],
+  },
+  {
+    heading: 'Well-Lit Paths: Operations',
+    notebooks: [
+      {
+        title: 'Flow Control and Multi-Tenant Fairness',
+        description:
+          'Configure priority bands, round-robin fairness, and late-binding scheduling. Test with multiple simulated tenants competing for GPU capacity.',
+        difficulty: 'Intermediate',
+        time: '45 min',
+      },
+      {
+        title: 'SLO-Aware Workload Autoscaling',
+        description:
+          'Set up HPA with EPP metrics and watch replicas scale based on queue depth. Then configure the Workload Variant Autoscaler for multi-model cost optimization.',
+        difficulty: 'Intermediate',
+        time: '60 min',
+      },
+      {
+        title: 'LoRA Adapter Rollouts',
+        description:
+          'Perform an incremental rollout of a new LoRA adapter using traffic splitting and gradual deployment. Monitor for regressions during the rollout.',
+        difficulty: 'Advanced',
+        time: '45 min',
+      },
+    ],
+  },
+  {
+    heading: 'Experimental',
+    notebooks: [
+      {
+        title: 'Asynchronous Processing with Redis',
+        description:
+          'Set up the Async Processor to pull inference requests from a Redis queue with flow-control gating. Ideal for batch workloads.',
         difficulty: 'Advanced',
         time: '60 min',
       },
       {
-        title: 'Multi‑Model Serving with Flow Control',
+        title: 'Batch Inference via the Batch Gateway',
         description:
-          'Serve multiple models with tenant isolation and priority dispatch.',
+          'Submit, track, and manage batch jobs via the OpenAI-compatible /v1/batches API. Co-locate batch and interactive workloads on shared infrastructure.',
         difficulty: 'Advanced',
         time: '45 min',
       },
@@ -320,10 +353,12 @@ export default function Notebooks() {
                 color: '#4D4D4D',
               }}
             >
-              Learn by running real notebooks. Follow along step by step to deploy{' '}
-              <span style={{ whiteSpace: 'nowrap' }}>llm&#x2011;d</span>, compare
-              routing strategies, tune autoscaling, and explore disaggregated
-              inference.
+              Explore llm&#x2011;d's well-lit paths through hands-on notebooks. Each
+              notebook walks you through a tested, benchmarked deployment
+              recipe{' '}
+              <span style={{ whiteSpace: 'nowrap' }}>step by step</span>,
+              from intelligent routing to disaggregated serving and
+              production operations.
             </p>
           </div>
 
@@ -340,9 +375,9 @@ export default function Notebooks() {
           >
             Each notebook is designed to be run locally or in any Jupyter
             environment. They include all the code, configuration, and
-            commentary you need to go from zero to a working result. Pick a
-            category below or start with the Getting Started series if this is
-            your first time.
+            commentary you need to go from zero to a working result. Start
+            with Getting Started if this is your first time, then follow
+            the well-lit paths for production-ready deployments.
           </p>
 
           {/* Category sections */}

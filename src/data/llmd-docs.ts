@@ -293,22 +293,25 @@ InferencePool integrates with the autoscaler, which monitors pool-level metrics 
     keywords: [
       'metrics', 'observability', 'monitoring', 'tracing', 'distributed tracing',
       'queue depth', 'request counts', 'cache hit', 'cache hit rate',
-      'prometheus', 'telemetry', 'dashboards', 'signals',
+      'prometheus', 'telemetry', 'dashboards', 'signals', 'grafana',
+      'prometheus adapter', 'hpa', 'dashboard recipes',
     ],
     content: `llm-d provides comprehensive observability features:
 
-1. Distributed tracing: Support for distributed tracing across the inference pipeline, allowing operators to trace a request from the router through prefill, KV cache operations, and decode to the final response.
+1. Grafana dashboards: The llm-d project includes dashboard recipes in guides/recipes/observability that provide pre-built Grafana dashboards for monitoring inference workloads. These dashboards visualize queue depth, cache hit rates, per-replica metrics, request latencies, and throughput in real time.
 
-2. EPP-exported metrics: The Endpoint Picker exports key metrics that are used for both monitoring and autoscaling:
+2. Distributed tracing: Support for distributed tracing across the inference pipeline, allowing operators to trace a request from the router through prefill, KV cache operations, and decode to the final response.
+
+3. EPP-exported metrics: The Endpoint Picker exports key metrics that are used for both monitoring and autoscaling:
    - Queue depth: Number of requests waiting to be processed on each worker
    - Request counts: Total and per-second request rates by model and pool
    - Cache hit rates: Percentage of requests that found matching KV cache entries, indicating routing efficiency
 
-3. Autoscaling signals: These metrics feed directly into the HPA/KEDA autoscaler and the Workload Variant Autoscaler (WVA) for making informed scaling decisions based on actual inference workload characteristics rather than generic resource utilization.
+4. Prometheus adapter for HPA: llm-d integrates with the Prometheus adapter to expose EPP metrics as custom metrics for the Kubernetes Horizontal Pod Autoscaler. This allows HPA to scale based on inference-specific signals such as queue depth and request rates rather than generic CPU or memory utilization.
 
-4. "True Demand" metric: Reflects actual demand including queued requests, not just in-flight requests. This provides autoscalers with an accurate view of total system load.
+5. Autoscaling signals: These metrics feed directly into the HPA/KEDA autoscaler and the Workload Variant Autoscaler (WVA) for making informed scaling decisions based on actual inference workload characteristics.
 
-Operators can use these metrics with standard monitoring stacks (Prometheus, Grafana) for dashboards and alerting.`,
+6. "True Demand" metric: Reflects actual demand including queued requests, not just in-flight requests. This provides autoscalers with an accurate view of total system load.`,
   },
   {
     topic: 'Model Servers',
@@ -368,5 +371,103 @@ The llm-d project follows a "well-lit path" approach, providing tested deploymen
 2. Active-active HA for the Router: Multiple router replicas run concurrently behind a load balancer, each maintaining an up-to-date view of worker health and cache state. If a router instance fails, traffic is seamlessly handled by the remaining replicas with no request loss or cache index staleness. This provides continuous availability without a standby failover delay.
 
 3. KV cache transfer: For disaggregated serving, the KV cache computed during prefill is transferred to decode workers using NIXL (NVIDIA's Interconnect eXchange Library) over InfiniBand or RoCE RDMA networks, enabling high-throughput, low-latency data movement between the separate worker pools.`,
+  },
+  {
+    topic: 'Well-Lit Paths',
+    keywords: [
+      'well-lit', 'well-lit paths', 'paths', 'recipes', 'deployment recipes',
+      'tested', 'benchmarked', 'validated', 'optimized baseline',
+      'predicted latency', 'precise prefix cache', 'tiered prefix cache',
+      'disaggregation', 'wide expert parallelism', 'flow control',
+      'workload autoscaling', 'rollouts', 'async processing',
+      'batch gateway', 'experimental',
+    ],
+    content: `Well-lit paths are tested, benchmarked deployment recipes that have been validated end-to-end on specific platforms and hardware combinations. They provide a known-good starting point for production deployments.
+
+llm-d provides 9 well-lit paths organized into three categories:
+
+Intelligent Routing:
+1. Optimized Baseline - the recommended starting configuration with prefix-cache-scorer and load-aware scoring for balanced throughput and latency
+2. Predicted Latency - uses an XGBoost model trained on live traffic to route requests to the replica predicted to serve them fastest
+3. Precise Prefix Cache - enables event-driven KV-cache indexing via ZMQ for exact block-level cache scoring instead of heuristic estimation
+
+Serving at Scale:
+4. Tiered Prefix Cache - configures hierarchical KV cache offloading from GPU to CPU to disk to expand effective cache capacity
+5. Prefill/Decode Disaggregation - separates prefill and decode phases onto dedicated worker pools for higher throughput and lower latency
+6. Wide Expert Parallelism - deploys large MoE models like DeepSeek-R1 across multiple nodes using LeaderWorkerSet with combined DP/EP
+
+Operations:
+7. Flow Control - configures priority bands, multi-tenant fairness, and late-binding scheduling
+8. Workload Autoscaling - sets up HPA with EPP metrics and the Workload Variant Autoscaler for multi-model cost optimization
+9. Rollouts - performs incremental rollouts of LoRA adapters, base models, or model server versions with traffic splitting
+
+Additionally, two experimental paths are available:
+- Async Processing - pulls inference requests from Redis or Google Pub/Sub with flow-control gating
+- Batch Gateway - manages batch jobs via the OpenAI-compatible /v1/batches API`,
+  },
+  {
+    topic: 'Rollouts',
+    keywords: [
+      'rollout', 'rollouts', 'incremental', 'canary', 'traffic splitting',
+      'gradual deployment', 'lora', 'adapter', 'base model',
+      'model server version', 'upgrade', 'regression', 'deployment strategy',
+    ],
+    content: `llm-d supports incremental rollout operations for safely deploying changes to LoRA adapters, base models, and model server versions.
+
+Key capabilities:
+
+1. Traffic splitting: During a rollout, traffic is gradually shifted from the old version to the new version. Operators configure the split ratio (for example 10/90, then 50/50, then 100/0) and advance the rollout in stages.
+
+2. LoRA adapter rollouts: New LoRA adapters can be deployed incrementally. A small percentage of traffic is routed to replicas serving the new adapter while the majority continues using the current adapter. This enables testing with real production traffic before full deployment.
+
+3. Base model rollouts: When upgrading to a new base model version, the rollout mechanism allows side-by-side comparison under production load. Metrics from both versions are collected for regression detection.
+
+4. Model server version rollouts: When upgrading vLLM or SGLang versions, the rollout mechanism ensures the new version performs correctly before full rollover.
+
+5. Regression monitoring: During a rollout, operators monitor key metrics (latency, throughput, error rate, cache hit rate) on both the old and new versions. If regressions are detected, the rollout can be paused or rolled back.
+
+6. Gradual deployment: The rollout proceeds through configurable stages, with health checks and metric validation at each stage before advancing to the next split ratio.`,
+  },
+  {
+    topic: 'Precise Prefix Cache',
+    keywords: [
+      'precise prefix cache', 'event-driven', 'zmq', 'zeromq', 'kv-cache indexing',
+      'block-level scoring', 'heuristic', 'exact scoring', 'vllm kv-cache events',
+      'block hash', 'dual-key', 'prefix scoring', 'cache index',
+    ],
+    content: `The Precise Prefix Cache is a well-lit path that upgrades llm-d's cache-aware routing from heuristic estimation to exact block-level scoring.
+
+How it works:
+
+1. Event-driven KV-cache indexing: Instead of estimating which prefixes are cached on each worker, the precise prefix cache uses event-driven tracking. When vLLM computes and stores KV cache blocks, it publishes events over ZMQ (ZeroMQ) messaging. The EPP subscribes to these events and maintains an exact, real-time index of which blocks reside on which worker.
+
+2. Block hash dual-key design: Each KV cache block is identified by a dual-key hash that captures both the token content and the model layer position. This enables precise matching - the router knows exactly which blocks of a request's prefix are already cached, down to the individual block level.
+
+3. Exact block-level scoring: When a new request arrives, the EPP computes block hashes for the request's prefix and looks them up in the global index. The score for each worker reflects the exact number of matching blocks, not a heuristic estimate. This produces more accurate routing decisions.
+
+4. Improvement over heuristic scoring: The default prefix-cache-scorer uses heuristic estimation based on prefix length matching. The precise prefix cache replaces this with exact block-level matching, which is particularly beneficial for multi-turn conversational workloads where prefix overlap patterns are complex.
+
+5. vLLM KV-cache events: The system relies on patched vLLM that emits cache lifecycle events (block allocation, eviction, migration) over a ZMQ pub/sub channel. The EPP consumes these events to keep its global index current with minimal latency.`,
+  },
+  {
+    topic: 'SGLang Support',
+    keywords: [
+      'sglang', 'alternative', 'model server', 'backend', 'vllm alternative',
+      'inference engine', 'optimized baseline', 'disaggregation',
+      'sglang support', 'serving engine',
+    ],
+    content: `SGLang is supported as an alternative model server backend alongside vLLM in llm-d.
+
+Key points:
+
+1. Dual backend support: llm-d is model-server-agnostic at the architecture level. The Router and EPP communicate with model servers via standard APIs, and the InferencePool abstraction hides backend differences from the routing layer. Operators can choose between vLLM and SGLang based on their workload characteristics and preferences.
+
+2. Supported well-lit paths: SGLang is explicitly supported in the Optimized Baseline well-lit path, allowing operators to deploy the recommended baseline configuration with SGLang instead of vLLM. SGLang is also supported in the Prefill/Decode Disaggregation guide for disaggregated serving deployments.
+
+3. SGLang optimizations: SGLang provides its own set of inference optimizations including RadixAttention for efficient prefix caching, constrained decoding, and optimized batch scheduling. These complement llm-d's routing and orchestration capabilities.
+
+4. Configuration: Switching between vLLM and SGLang requires updating the model server image and any server-specific flags in the InferencePool configuration. The router and EPP configuration remain unchanged because both backends expose OpenAI-compatible APIs.
+
+5. Compatibility: Both vLLM and SGLang can run in the same cluster on different InferencePools, enabling operators to use different backends for different models or workloads.`,
   },
 ]
