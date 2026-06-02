@@ -1,0 +1,130 @@
+@import "tailwindcss";
+
+@theme {
+  --color-rh-red: #EE0000;
+  --color-rh-red-dark: #A30000;
+  --color-rh-red-light: #FF4D4D;
+  --color-rh-red-50: #FFF0F0;
+  --color-rh-red-100: #FFD6D6;
+  --color-rh-red-200: #FFAAAA;
+  --color-rh-red-300: #FF7A7A;
+  --color-rh-red-400: #FF4D4D;
+  --color-rh-red-500: #EE0000;
+  --color-rh-red-600: #CC0000;
+  --color-rh-red-700: #A30000;
+  --color-rh-red-800: #7D0000;
+  --color-rh-red-900: #570000;
+
+  --color-rh-black: #151515;
+  --color-rh-gray-900: #1F1F1F;
+  --color-rh-gray-800: #292929;
+  --color-rh-gray-700: #3C3F42;
+  --color-rh-gray-600: #4D4D4D;
+  --color-rh-gray-500: #6A6E73;
+  --color-rh-gray-400: #8A8D90;
+  --color-rh-gray-300: #B8BBBE;
+  --color-rh-gray-200: #D2D2D2;
+  --color-rh-gray-100: #E0E0E0;
+  --color-rh-gray-50: #F0F0F0;
+  --color-rh-white: #FFFFFF;
+
+  --color-rh-blue: #0066CC;
+  --color-rh-blue-light: #4394E5;
+  --color-rh-blue-dark: #004080;
+
+  --color-rh-gold: #F0AB00;
+  --color-rh-gold-light: #F4C951;
+
+  --color-rh-green: #3E8635;
+  --color-rh-green-light: #5BA352;
+
+  --color-rh-purple: #5E40BE;
+  --color-rh-purple-light: #8476D1;
+
+  --color-rh-teal: #009596;
+  --color-rh-teal-light: #37B5B6;
+
+  --font-display: 'Red Hat Display', sans-serif;
+  --font-body: 'Red Hat Text', sans-serif;
+  --font-mono: 'Red Hat Mono', monospace;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--color-rh-white);
+  color: var(--color-rh-black);
+  line-height: 1.6;
+}
+
+::selection {
+  background-color: var(--color-rh-red-200);
+  color: var(--color-rh-red-900);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-rh-gray-50);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-rh-gray-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-rh-gray-400);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-20px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(238, 0, 0, 0.2); }
+  50% { box-shadow: 0 0 40px rgba(238, 0, 0, 0.4); }
+}
+
+.animate-float { animation: float 6s ease-in-out infinite; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(21, 21, 21, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.text-gradient {
+  background: linear-gradient(135deg, var(--color-rh-red) 0%, var(--color-rh-red-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.bg-mesh {
+  background:
+    radial-gradient(at 20% 20%, rgba(238, 0, 0, 0.08) 0px, transparent 50%),
+    radial-gradient(at 80% 40%, rgba(0, 102, 204, 0.05) 0px, transparent 50%),
+    radial-gradient(at 50% 80%, rgba(94, 64, 190, 0.05) 0px, transparent 50%);
+}
