@@ -419,7 +419,7 @@ function GroupLabels() {
         style={{
           position: 'absolute',
           left: 80,
-          top: 405,
+          top: 395,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
@@ -435,9 +435,9 @@ function GroupLabels() {
         style={{
           position: 'absolute',
           left: 65,
-          top: 420,
+          top: 416,
           width: 570,
-          height: 135,
+          height: 145,
           borderRadius: '12px',
           border: `1.5px dashed ${GRAY_200}`,
           backgroundColor: 'rgba(240, 240, 240, 0.3)',
