@@ -225,30 +225,30 @@ interface LineDef {
   to: string
 }
 
-const DIAGRAM_W = 700
-const DIAGRAM_H = 580
+const DIAGRAM_W = 760
+const DIAGRAM_H = 600
 
 const BOXES: BoxDef[] = [
   // Layer 1 - Client
-  { id: 'client', label: 'Client', x: 290, y: 0, w: 120, h: 44 },
+  { id: 'client', label: 'Client', x: 310, y: 10, w: 120, h: 44 },
   // Layer 2 - Envoy
-  { id: 'envoy', label: 'Envoy Proxy', sublabel: 'API Gateway', x: 240, y: 80, w: 220, h: 50 },
+  { id: 'envoy', label: 'Envoy Proxy', sublabel: 'API Gateway', x: 260, y: 86, w: 220, h: 50 },
   // Layer 3 - EPP (prominent)
-  { id: 'epp', label: 'Endpoint Picker', sublabel: 'llm‑d Router', x: 220, y: 170, w: 260, h: 56, accent: true },
+  { id: 'epp', label: 'Endpoint Picker', sublabel: 'llm‑d Router', x: 240, y: 180, w: 260, h: 56, accent: true },
   // Layer 4 - Workers (2 per group)
-  { id: 'prefill', label: 'Prefill Worker 1', x: 60, y: 280, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'prefill-2', label: 'Prefill Worker 2', x: 60, y: 326, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'decode', label: 'Decode Worker 1', x: 500, y: 280, w: 140, h: 40, group: 'decode-group' },
-  { id: 'decode-2', label: 'Decode Worker 2', x: 500, y: 326, w: 140, h: 40, group: 'decode-group' },
+  { id: 'prefill', label: 'Prefill Worker 1', x: 100, y: 296, w: 140, h: 40, group: 'prefill-group' },
+  { id: 'prefill-2', label: 'Prefill Worker 2', x: 100, y: 346, w: 140, h: 40, group: 'prefill-group' },
+  { id: 'decode', label: 'Decode Worker 1', x: 500, y: 296, w: 140, h: 40, group: 'decode-group' },
+  { id: 'decode-2', label: 'Decode Worker 2', x: 500, y: 346, w: 140, h: 40, group: 'decode-group' },
   // Layer 5 - KV Cache
-  { id: 'kv-gpu', label: 'GPU HBM', x: 80, y: 430, w: 160, h: 42 },
-  { id: 'kv-cpu', label: 'CPU DRAM', x: 270, y: 430, w: 160, h: 42 },
-  { id: 'kv-disk', label: 'Disk / NVMe', x: 460, y: 430, w: 160, h: 42 },
-  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 270, y: 500, w: 160, h: 42 },
-  // Side components
-  { id: 'autoscaler', label: 'Autoscaler', x: 0, y: 200, w: 130, h: 44 },
-  { id: 'latency-predictor', label: 'Latency Predictor', x: 560, y: 170, w: 140, h: 44 },
-  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 560, y: 224, w: 140, h: 44 },
+  { id: 'kv-gpu', label: 'GPU HBM', x: 110, y: 450, w: 150, h: 42 },
+  { id: 'kv-cpu', label: 'CPU DRAM', x: 295, y: 450, w: 150, h: 42 },
+  { id: 'kv-disk', label: 'Disk / NVMe', x: 480, y: 450, w: 150, h: 42 },
+  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 295, y: 520, w: 150, h: 42 },
+  // Side components (with breathing room from edges)
+  { id: 'autoscaler', label: 'Autoscaler', x: 20, y: 200, w: 120, h: 44 },
+  { id: 'latency-predictor', label: 'Latency Predictor', x: 600, y: 180, w: 140, h: 44 },
+  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 600, y: 236, w: 140, h: 44 },
 ]
 
 const LINES: LineDef[] = [
@@ -386,8 +386,8 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 60,
-          top: 258,
+          left: 100,
+          top: 274,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
@@ -403,7 +403,7 @@ function GroupLabels() {
         style={{
           position: 'absolute',
           left: 500,
-          top: 258,
+          top: 274,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
@@ -418,8 +418,8 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 80,
-          top: 395,
+          left: 110,
+          top: 415,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
@@ -434,10 +434,10 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 65,
-          top: 416,
-          width: 570,
-          height: 145,
+          left: 95,
+          top: 435,
+          width: 550,
+          height: 140,
           borderRadius: '12px',
           border: `1.5px dashed ${GRAY_200}`,
           backgroundColor: 'rgba(240, 240, 240, 0.3)',
