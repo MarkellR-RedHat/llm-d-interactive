@@ -7,6 +7,7 @@ interface Notebook {
   description: string
   difficulty: 'Beginner' | 'Intermediate' | 'Advanced'
   time: string
+  file?: string
 }
 
 interface Category {
@@ -24,6 +25,7 @@ const categories: Category[] = [
           'Follow the Optimized Baseline well-lit path to deploy Qwen3-32B with prefix-cache and load-aware routing on 16 GPUs.',
         difficulty: 'Beginner',
         time: '45 min',
+        file: 'notebooks/01-first-deployment.ipynb',
       },
       {
         title: 'Sending Your First Requests',
@@ -31,6 +33,7 @@ const categories: Category[] = [
           'Use the OpenAI-compatible API to send chat completions, explore response formats, and monitor basic metrics.',
         difficulty: 'Beginner',
         time: '20 min',
+        file: 'notebooks/02-sending-requests.ipynb',
       },
       {
         title: 'Understanding the Router Dashboard',
@@ -50,6 +53,7 @@ const categories: Category[] = [
           'Deploy the recommended baseline configuration with prefix-cache-scorer and load-aware scoring. Compare throughput and TTFT against raw round-robin.',
         difficulty: 'Intermediate',
         time: '45 min',
+        file: 'notebooks/03-optimized-baseline.ipynb',
       },
       {
         title: 'Precise Prefix Cache Routing',
@@ -76,6 +80,7 @@ const categories: Category[] = [
           'Deploy gpt-oss-120b with 8 TP=1 prefill and 2 TP=4 decode workers. Measure throughput per GPU improvement and ITL reduction.',
         difficulty: 'Advanced',
         time: '75 min',
+        file: 'notebooks/04-pd-disaggregation.ipynb',
       },
       {
         title: 'Tiered Prefix Cache: CPU and Disk Offloading',
@@ -102,6 +107,7 @@ const categories: Category[] = [
           'Configure priority bands, round-robin fairness, and late-binding scheduling. Test with multiple simulated tenants competing for GPU capacity.',
         difficulty: 'Intermediate',
         time: '45 min',
+        file: 'notebooks/05-flow-control.ipynb',
       },
       {
         title: 'SLO-Aware Workload Autoscaling',
@@ -109,6 +115,7 @@ const categories: Category[] = [
           'Set up HPA with EPP metrics and watch replicas scale based on queue depth. Then configure the Workload Variant Autoscaler for multi-model cost optimization.',
         difficulty: 'Intermediate',
         time: '60 min',
+        file: 'notebooks/06-autoscaling.ipynb',
       },
       {
         title: 'LoRA Adapter Rollouts',
@@ -170,7 +177,9 @@ function NotebookCard({
       className="notebook-card-col"
     >
       <a
-        href="#"
+        href={notebook.file ? `${import.meta.env.BASE_URL}${notebook.file}` : undefined}
+        download={notebook.file ? undefined : undefined}
+        onClick={notebook.file ? undefined : (e) => e.preventDefault()}
         style={{
           display: 'flex',
           flexDirection: 'column',
@@ -182,8 +191,11 @@ function NotebookCard({
           position: 'relative',
           top: '0',
           transition: 'ease 0.4s all',
+          cursor: notebook.file ? 'pointer' : 'default',
+          opacity: notebook.file ? 1 : 0.7,
         }}
         onMouseEnter={(e) => {
+          if (!notebook.file) return
           e.currentTarget.style.top = '-4px'
           e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'
           e.currentTarget.style.backgroundColor = '#EAEAEA'
@@ -250,6 +262,17 @@ function NotebookCard({
             }}
           >
             {notebook.time}
+          </span>
+          <span
+            style={{
+              marginLeft: 'auto',
+              fontSize: '13px',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 600,
+              color: notebook.file ? '#9b4d9b' : '#8A8D90',
+            }}
+          >
+            {notebook.file ? 'Download .ipynb ↓' : 'Coming soon'}
           </span>
         </div>
       </a>
