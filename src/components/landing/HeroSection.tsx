@@ -3,13 +3,15 @@ import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
 
 export default function HeroSection() {
+  const sectionRef = useRef<HTMLElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
   const mouseRef = useRef({ x: -9999, y: -9999 })
 
   useEffect(() => {
+    const section = sectionRef.current
     const canvas = canvasRef.current
-    if (!canvas) return
+    if (!section || !canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -31,26 +33,26 @@ export default function HeroSection() {
     const nodes: { x: number; y: number; vx: number; vy: number; r: number }[] = []
     for (let i = 0; i < count; i++) {
       nodes.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.6,
-        vy: (Math.random() - 0.5) * 0.6,
-        r: Math.random() * 2 + 1,
+        x: Math.random() * (w || 1200),
+        y: Math.random() * (h || 600),
+        vx: (Math.random() - 0.5) * 0.5,
+        vy: (Math.random() - 0.5) * 0.5,
+        r: Math.random() * 2 + 0.8,
       })
     }
 
     const handleMouse = (e: MouseEvent) => {
-      const rect = canvas.getBoundingClientRect()
+      const rect = section.getBoundingClientRect()
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
     const handleLeave = () => {
       mouseRef.current = { x: -9999, y: -9999 }
     }
-    canvas.addEventListener('mousemove', handleMouse)
-    canvas.addEventListener('mouseleave', handleLeave)
+    section.addEventListener('mousemove', handleMouse)
+    section.addEventListener('mouseleave', handleLeave)
 
-    const connectDist = 130
-    const mouseDist = 160
+    const connectDist = 120
+    const mouseDist = 140
 
     const animate = () => {
       ctx.clearRect(0, 0, w, h)
@@ -62,25 +64,25 @@ export default function HeroSection() {
         const dy = mouseRef.current.y - n.y
         const dist = Math.sqrt(dx * dx + dy * dy)
         if (dist < mouseDist && dist > 1) {
-          const force = (mouseDist - dist) / mouseDist
-          n.vx += dx / dist * force * 0.8
-          n.vy += dy / dist * force * 0.8
+          const force = (mouseDist - dist) / mouseDist * 0.02
+          n.vx += dx * force
+          n.vy += dy * force
         }
 
         n.x += n.vx
         n.y += n.vy
-        n.vx *= 0.94
-        n.vy *= 0.94
+        n.vx *= 0.985
+        n.vy *= 0.985
 
-        if (n.x < 0) { n.x = 0; n.vx = Math.abs(n.vx) * 0.5 }
-        if (n.x > w) { n.x = w; n.vx = -Math.abs(n.vx) * 0.5 }
-        if (n.y < 0) { n.y = 0; n.vy = Math.abs(n.vy) * 0.5 }
-        if (n.y > h) { n.y = h; n.vy = -Math.abs(n.vy) * 0.5 }
+        if (n.x < 0) { n.x = 0; n.vx *= -1 }
+        if (n.x > w) { n.x = w; n.vx *= -1 }
+        if (n.y < 0) { n.y = 0; n.vy *= -1 }
+        if (n.y > h) { n.y = h; n.vy *= -1 }
 
         const speed = Math.sqrt(n.vx * n.vx + n.vy * n.vy)
-        if (speed < 0.15) {
-          n.vx += (Math.random() - 0.5) * 0.1
-          n.vy += (Math.random() - 0.5) * 0.1
+        if (speed < 0.2) {
+          n.vx += (Math.random() - 0.5) * 0.08
+          n.vy += (Math.random() - 0.5) * 0.08
         }
 
         for (let j = i + 1; j < count; j++) {
@@ -89,19 +91,19 @@ export default function HeroSection() {
           const cdy = n.y - m.y
           const cd = Math.sqrt(cdx * cdx + cdy * cdy)
           if (cd < connectDist) {
-            const alpha = (1 - cd / connectDist) * 0.2
+            const alpha = (1 - cd / connectDist) * 0.18
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
             ctx.strokeStyle = `rgba(200, 50, 50, ${alpha})`
-            ctx.lineWidth = 0.8
+            ctx.lineWidth = 0.7
             ctx.stroke()
           }
         }
 
         ctx.beginPath()
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(210, 60, 60, 0.45)'
+        ctx.fillStyle = 'rgba(210, 60, 60, 0.4)'
         ctx.fill()
       }
 
@@ -111,14 +113,15 @@ export default function HeroSection() {
 
     return () => {
       window.removeEventListener('resize', resize)
-      canvas.removeEventListener('mousemove', handleMouse)
-      canvas.removeEventListener('mouseleave', handleLeave)
+      section.removeEventListener('mousemove', handleMouse)
+      section.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(animationRef.current)
     }
   }, [])
 
   return (
     <section
+      ref={sectionRef}
       style={{
         position: 'relative',
         overflow: 'hidden',
@@ -127,6 +130,7 @@ export default function HeroSection() {
         backgroundColor: '#EDEDED',
       }}
     >
+      {/* Canvas renders ON TOP of text, like UPenn's particles-js */}
       <canvas
         ref={canvasRef}
         style={{
@@ -135,14 +139,16 @@ export default function HeroSection() {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: 1,
+          zIndex: 10,
+          pointerEvents: 'none',
         }}
       />
 
+      {/* Content sits below canvas visually, but is still clickable */}
       <div
         style={{
           position: 'relative',
-          zIndex: 2,
+          zIndex: 1,
           maxWidth: '1244px',
           margin: '0 auto',
           padding: '0 30px',
@@ -163,7 +169,7 @@ export default function HeroSection() {
             maxWidth: '900px',
           }}
         >
-          Learn how to serve large language models with <span style={{whiteSpace: 'nowrap'}}>llm-d</span>
+          Learn how to serve large language models with <span style={{whiteSpace: 'nowrap'}}>llm&#x2011;d</span>
         </motion.h1>
 
         <motion.p
@@ -203,6 +209,8 @@ export default function HeroSection() {
               textDecoration: 'none',
               transition: 'background 0.5s ease',
               letterSpacing: '0.03em',
+              position: 'relative',
+              zIndex: 20,
             }}
             onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#A30000')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
@@ -225,6 +233,8 @@ export default function HeroSection() {
               border: '2px solid #3C3F42',
               transition: 'all 0.3s ease',
               letterSpacing: '0.03em',
+              position: 'relative',
+              zIndex: 20,
             }}
             onMouseEnter={e => {
               e.currentTarget.style.backgroundColor = '#151515'
