@@ -27,14 +27,14 @@ export default function HeroSection() {
     resize()
     window.addEventListener('resize', resize)
 
-    const count = 90
+    const count = 80
     const nodes: { x: number; y: number; vx: number; vy: number; r: number }[] = []
     for (let i = 0; i < count; i++) {
       nodes.push({
         x: Math.random() * w,
         y: Math.random() * h,
-        vx: (Math.random() - 0.5) * 0.4,
-        vy: (Math.random() - 0.5) * 0.4,
+        vx: (Math.random() - 0.5) * 0.6,
+        vy: (Math.random() - 0.5) * 0.6,
         r: Math.random() * 2 + 1,
       })
     }
@@ -49,9 +49,8 @@ export default function HeroSection() {
     canvas.addEventListener('mousemove', handleMouse)
     canvas.addEventListener('mouseleave', handleLeave)
 
-    const connectDist = 150
-    const mouseDist = 200
-    const mouseStrength = 0.0008
+    const connectDist = 130
+    const mouseDist = 160
 
     const animate = () => {
       ctx.clearRect(0, 0, w, h)
@@ -62,21 +61,27 @@ export default function HeroSection() {
         const dx = mouseRef.current.x - n.x
         const dy = mouseRef.current.y - n.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < mouseDist && dist > 0) {
-          const force = (mouseDist - dist) / mouseDist * mouseStrength
-          n.vx += dx * force
-          n.vy += dy * force
+        if (dist < mouseDist && dist > 1) {
+          const force = (mouseDist - dist) / mouseDist
+          n.vx += dx / dist * force * 0.8
+          n.vy += dy / dist * force * 0.8
         }
 
         n.x += n.vx
         n.y += n.vy
-        n.vx *= 0.995
-        n.vy *= 0.995
+        n.vx *= 0.94
+        n.vy *= 0.94
 
-        if (n.x < 0) { n.x = 0; n.vx *= -1 }
-        if (n.x > w) { n.x = w; n.vx *= -1 }
-        if (n.y < 0) { n.y = 0; n.vy *= -1 }
-        if (n.y > h) { n.y = h; n.vy *= -1 }
+        if (n.x < 0) { n.x = 0; n.vx = Math.abs(n.vx) * 0.5 }
+        if (n.x > w) { n.x = w; n.vx = -Math.abs(n.vx) * 0.5 }
+        if (n.y < 0) { n.y = 0; n.vy = Math.abs(n.vy) * 0.5 }
+        if (n.y > h) { n.y = h; n.vy = -Math.abs(n.vy) * 0.5 }
+
+        const speed = Math.sqrt(n.vx * n.vx + n.vy * n.vy)
+        if (speed < 0.15) {
+          n.vx += (Math.random() - 0.5) * 0.1
+          n.vy += (Math.random() - 0.5) * 0.1
+        }
 
         for (let j = i + 1; j < count; j++) {
           const m = nodes[j]
@@ -84,19 +89,19 @@ export default function HeroSection() {
           const cdy = n.y - m.y
           const cd = Math.sqrt(cdx * cdx + cdy * cdy)
           if (cd < connectDist) {
-            const alpha = (1 - cd / connectDist) * 0.25
+            const alpha = (1 - cd / connectDist) * 0.2
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
-            ctx.strokeStyle = `rgba(238, 60, 60, ${alpha})`
-            ctx.lineWidth = 0.6
+            ctx.strokeStyle = `rgba(200, 50, 50, ${alpha})`
+            ctx.lineWidth = 0.8
             ctx.stroke()
           }
         }
 
         ctx.beginPath()
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = 'rgba(255, 100, 100, 0.5)'
+        ctx.fillStyle = 'rgba(210, 60, 60, 0.45)'
         ctx.fill()
       }
 
@@ -119,7 +124,7 @@ export default function HeroSection() {
         overflow: 'hidden',
         paddingTop: '200px',
         paddingBottom: '120px',
-        background: 'linear-gradient(135deg, #0C0C0C 0%, #1A0A0A 40%, #1C1010 70%, #111 100%)',
+        backgroundColor: '#EDEDED',
       }}
     >
       <canvas
@@ -131,33 +136,6 @@ export default function HeroSection() {
           width: '100%',
           height: '100%',
           zIndex: 1,
-        }}
-      />
-
-      <div
-        style={{
-          position: 'absolute',
-          top: '15%',
-          left: '60%',
-          width: '600px',
-          height: '600px',
-          background: 'radial-gradient(circle, rgba(238,0,0,0.08) 0%, transparent 70%)',
-          borderRadius: '50%',
-          zIndex: 1,
-          pointerEvents: 'none',
-        }}
-      />
-      <div
-        style={{
-          position: 'absolute',
-          bottom: '10%',
-          left: '10%',
-          width: '400px',
-          height: '400px',
-          background: 'radial-gradient(circle, rgba(238,0,0,0.05) 0%, transparent 70%)',
-          borderRadius: '50%',
-          zIndex: 1,
-          pointerEvents: 'none',
         }}
       />
 
@@ -180,7 +158,7 @@ export default function HeroSection() {
             fontWeight: 300,
             lineHeight: '110%',
             letterSpacing: '-0.02em',
-            color: '#ffffff',
+            color: '#151515',
             paddingBottom: '32px',
             maxWidth: '900px',
           }}
@@ -195,7 +173,7 @@ export default function HeroSection() {
           style={{
             fontSize: '20px',
             lineHeight: '32px',
-            color: 'rgba(255,255,255,0.7)',
+            color: '#4D4D4D',
             maxWidth: '600px',
             marginBottom: '48px',
           }}
@@ -237,24 +215,26 @@ export default function HeroSection() {
               display: 'inline-block',
               padding: '14px 24px',
               backgroundColor: 'transparent',
-              color: '#fff',
+              color: '#151515',
               fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: '16px',
               textTransform: 'uppercase' as const,
               borderRadius: '0',
               textDecoration: 'none',
-              border: '2px solid rgba(255,255,255,0.3)',
-              transition: 'background 0.5s ease, border-color 0.5s ease',
+              border: '2px solid #3C3F42',
+              transition: 'all 0.3s ease',
               letterSpacing: '0.03em',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
+              e.currentTarget.style.backgroundColor = '#151515'
+              e.currentTarget.style.color = '#fff'
+              e.currentTarget.style.borderColor = '#151515'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
+              e.currentTarget.style.color = '#151515'
+              e.currentTarget.style.borderColor = '#3C3F42'
             }}
           >
             Explore Tools

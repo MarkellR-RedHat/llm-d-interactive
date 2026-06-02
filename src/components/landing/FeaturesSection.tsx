@@ -94,7 +94,6 @@ export default function FeaturesSection() {
           </p>
         </motion.div>
 
-        {/* 3-column card grid, UPenn style */}
         <div
           style={{
             display: 'flex',
@@ -120,22 +119,24 @@ export default function FeaturesSection() {
                 style={{
                   display: 'block',
                   padding: '40px',
-                  backgroundColor: '#151515',
-                  color: '#fff',
+                  backgroundColor: '#F0F0F0',
+                  color: '#151515',
                   textAlign: 'center',
                   textDecoration: 'none',
                   height: '100%',
                   position: 'relative',
                   top: '0',
-                  transition: 'ease 0.5s all',
+                  transition: 'ease 0.4s all',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.top = '8px'
-                  e.currentTarget.style.backgroundColor = '#1F1F1F'
+                  e.currentTarget.style.top = '-4px'
+                  e.currentTarget.style.boxShadow = '0 8px 24px rgba(0,0,0,0.1)'
+                  e.currentTarget.style.backgroundColor = '#EAEAEA'
                 }}
                 onMouseLeave={e => {
                   e.currentTarget.style.top = '0'
-                  e.currentTarget.style.backgroundColor = '#151515'
+                  e.currentTarget.style.boxShadow = 'none'
+                  e.currentTarget.style.backgroundColor = '#F0F0F0'
                 }}
               >
                 <item.icon
@@ -151,10 +152,10 @@ export default function FeaturesSection() {
                   style={{
                     fontFamily: 'var(--font-display)',
                     fontWeight: 700,
-                    fontSize: '28px',
-                    lineHeight: '1.2',
+                    fontSize: '24px',
+                    lineHeight: '1.3',
                     marginBottom: '14px',
-                    color: '#fff',
+                    color: '#151515',
                   }}
                 >
                   {item.title}
@@ -162,8 +163,8 @@ export default function FeaturesSection() {
                 <p
                   style={{
                     fontSize: '16px',
-                    lineHeight: '24px',
-                    color: 'rgba(255,255,255,0.7)',
+                    lineHeight: '26px',
+                    color: '#4D4D4D',
                     margin: 0,
                   }}
                 >
@@ -175,7 +176,6 @@ export default function FeaturesSection() {
         </div>
       </div>
 
-      {/* Responsive: cards go to 2-col on tablet, 1-col on mobile */}
       <style>{`
         @media (max-width: 1024px) {
           .features-card-col {
