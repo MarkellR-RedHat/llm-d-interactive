@@ -9,6 +9,7 @@ import CapacityPlanner from './pages/CapacityPlanner'
 import Architecture from './pages/Architecture'
 import MigrationGuide from './pages/MigrationGuide'
 import Troubleshooting from './pages/Troubleshooting'
+import Notebooks from './pages/Notebooks'
 
 function App() {
   const location = useLocation()
@@ -25,6 +26,7 @@ function App() {
           <Route path="/architecture" element={<Architecture />} />
           <Route path="/migration" element={<MigrationGuide />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
+          <Route path="/notebooks" element={<Notebooks />} />
         </Routes>
       </AnimatePresence>
     </Layout>

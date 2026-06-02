@@ -1,28 +1,16 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { ArrowRight, Sparkles } from 'lucide-react'
-
-interface Particle {
-  x: number
-  y: number
-  vx: number
-  vy: number
-  radius: number
-  opacity: number
-  connections: number[]
-}
+import { BookOpen, Compass, FlaskConical } from 'lucide-react'
 
 export default function HeroSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
-  const particlesRef = useRef<Particle[]>([])
-  const mouseRef = useRef({ x: 0, y: 0 })
   const animationRef = useRef<number>(0)
+  const mouseRef = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
-
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
@@ -35,194 +23,187 @@ export default function HeroSection() {
     resize()
     window.addEventListener('resize', resize)
 
-    const particleCount = 80
-    const particles: Particle[] = []
-
-    for (let i = 0; i < particleCount; i++) {
-      particles.push({
+    const nodes: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = []
+    for (let i = 0; i < 60; i++) {
+      nodes.push({
         x: Math.random() * canvas.offsetWidth,
         y: Math.random() * canvas.offsetHeight,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: (Math.random() - 0.5) * 0.5,
-        radius: Math.random() * 2 + 1,
-        opacity: Math.random() * 0.5 + 0.2,
-        connections: [],
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 1.5 + 0.5,
+        o: Math.random() * 0.3 + 0.1,
       })
     }
 
-    particlesRef.current = particles
-
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleMouse = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
-      mouseRef.current = {
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      }
+      mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
-
-    canvas.addEventListener('mousemove', handleMouseMove)
+    canvas.addEventListener('mousemove', handleMouse)
 
     const animate = () => {
       const w = canvas.offsetWidth
       const h = canvas.offsetHeight
       ctx.clearRect(0, 0, w, h)
 
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i]
+        n.x += n.vx
+        n.y += n.vy
+        if (n.x < 0 || n.x > w) n.vx *= -1
+        if (n.y < 0 || n.y > h) n.vy *= -1
 
-        p.x += p.vx
-        p.y += p.vy
-
-        if (p.x < 0 || p.x > w) p.vx *= -1
-        if (p.y < 0 || p.y > h) p.vy *= -1
-
-        const dx = mouseRef.current.x - p.x
-        const dy = mouseRef.current.y - p.y
+        const dx = mouseRef.current.x - n.x
+        const dy = mouseRef.current.y - n.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-
-        if (dist < 150) {
-          const force = (150 - dist) / 150
-          p.vx += dx * force * 0.0005
-          p.vy += dy * force * 0.0005
+        if (dist < 180) {
+          n.vx += dx * (180 - dist) / 180 * 0.0003
+          n.vy += dy * (180 - dist) / 180 * 0.0003
         }
-
-        p.vx *= 0.99
-        p.vy *= 0.99
+        n.vx *= 0.995
+        n.vy *= 0.995
 
         ctx.beginPath()
-        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(238, 0, 0, ${p.opacity})`
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(238, 0, 0, ${n.o})`
         ctx.fill()
 
-        for (let j = i + 1; j < particles.length; j++) {
-          const p2 = particles[j]
-          const connDx = p.x - p2.x
-          const connDy = p.y - p2.y
-          const connDist = Math.sqrt(connDx * connDx + connDy * connDy)
-
-          if (connDist < 120) {
-            const alpha = (1 - connDist / 120) * 0.15
+        for (let j = i + 1; j < nodes.length; j++) {
+          const m = nodes[j]
+          const cd = Math.sqrt((n.x - m.x) ** 2 + (n.y - m.y) ** 2)
+          if (cd < 140) {
             ctx.beginPath()
-            ctx.moveTo(p.x, p.y)
-            ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(238, 0, 0, ${alpha})`
+            ctx.moveTo(n.x, n.y)
+            ctx.lineTo(m.x, m.y)
+            ctx.strokeStyle = `rgba(238, 0, 0, ${(1 - cd / 140) * 0.08})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }
         }
       }
-
       animationRef.current = requestAnimationFrame(animate)
     }
-
     animate()
 
     return () => {
       window.removeEventListener('resize', resize)
-      canvas.removeEventListener('mousemove', handleMouseMove)
+      canvas.removeEventListener('mousemove', handleMouse)
       cancelAnimationFrame(animationRef.current)
     }
   }, [])
 
+  const pathways = [
+    {
+      icon: BookOpen,
+      title: 'Learn the fundamentals',
+      desc: 'Understand what llm-d is, how disaggregated inference works, and why it matters.',
+      path: '/learn',
+      label: 'Start learning',
+    },
+    {
+      icon: Compass,
+      title: 'Explore the tools',
+      desc: 'Try the configurator, visualize routing strategies, and plan your cluster capacity.',
+      path: '/configurator',
+      label: 'Explore tools',
+    },
+    {
+      icon: FlaskConical,
+      title: 'Hands-on tutorials',
+      desc: 'Run Jupyter notebooks that walk you through real deployments step by step.',
+      path: '/notebooks',
+      label: 'Open notebooks',
+    },
+  ]
+
   return (
     <section className="relative min-h-[100vh] flex items-center overflow-hidden bg-rh-black">
-      <canvas
-        ref={canvasRef}
-        className="absolute inset-0 w-full h-full"
-      />
+      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+      <div className="absolute inset-0 bg-gradient-to-b from-rh-black/40 via-transparent to-rh-black/90" />
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-rh-red/6 rounded-full blur-[160px]" />
+      <div className="absolute bottom-1/3 right-1/3 w-[400px] h-[400px] bg-rh-blue/4 rounded-full blur-[140px]" />
 
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-rh-black/80" />
-
-      <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-rh-red/10 rounded-full blur-[120px]" />
-      <div className="absolute bottom-1/4 right-1/4 w-72 h-72 bg-rh-blue/5 rounded-full blur-[100px]" />
-
-      <div className="relative z-10 max-w-7xl mx-auto px-6 lg:px-8 py-32">
-        <div className="max-w-4xl">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
+      <div className="relative z-10 max-w-6xl mx-auto px-8 lg:px-12 py-40 w-full">
+        <div className="max-w-3xl mb-20">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-rh-red/10 border border-rh-red/20 mb-8"
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-rh-red text-sm font-medium tracking-wide uppercase mb-6"
           >
-            <Sparkles className="w-4 h-4 text-rh-red" />
-            <span className="text-rh-red text-sm font-medium">Open source LLM serving platform</span>
-          </motion.div>
+            Open source LLM serving platform
+          </motion.p>
 
           <motion.h1
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="font-display font-extrabold text-5xl sm:text-6xl lg:text-7xl text-white leading-[1.1] tracking-tight mb-6"
+            transition={{ duration: 0.5, delay: 0.3 }}
+            className="font-display font-extrabold text-4xl sm:text-5xl lg:text-6xl text-white leading-[1.15] tracking-tight mb-8"
           >
-            Serve LLMs at scale.
+            Learn how to serve
             <br />
-            <span className="text-gradient">Intelligently.</span>
+            large language models
+            <br />
+            <span className="text-gradient">with llm-d</span>
           </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            className="text-lg sm:text-xl text-rh-gray-400 max-w-2xl mb-10 leading-relaxed"
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-lg text-rh-gray-300 max-w-xl leading-relaxed"
           >
-            llm-d is a Kubernetes-native platform for serving large language models with
-            disaggregated inference, intelligent routing, and production-grade autoscaling.
-            Go from zero to production in minutes.
+            This is the interactive learning center for llm-d. Explore how disaggregated
+            inference, intelligent routing, and autoscaling work together on Kubernetes.
+            Learn at your own pace with guides, interactive tools, and hands-on notebooks.
           </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.5 }}
-            className="flex flex-wrap gap-4"
-          >
-            <Link
-              to="/configurator"
-              className="group inline-flex items-center gap-2 px-8 py-4 bg-rh-red text-white font-semibold rounded-xl hover:bg-rh-red-dark transition-all shadow-lg shadow-rh-red/25 hover:shadow-xl hover:shadow-rh-red/30 no-underline"
-            >
-              Start Building
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </Link>
-            <Link
-              to="/learn"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-white/10 text-white font-semibold rounded-xl hover:bg-white/15 transition-all border border-white/10 no-underline"
-            >
-              Learn llm-d
-            </Link>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.8 }}
-            className="mt-16 grid grid-cols-3 gap-8 max-w-lg"
-          >
-            {[
-              { value: '10x', label: 'Throughput gain' },
-              { value: '<100ms', label: 'Routing latency' },
-              { value: '40%', label: 'Cost reduction' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="font-display font-bold text-2xl text-white">{stat.value}</div>
-                <div className="text-rh-gray-500 text-xs mt-1">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
         </div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.55 }}
+          className="grid grid-cols-1 md:grid-cols-3 gap-6"
+        >
+          {pathways.map((p, i) => (
+            <motion.div
+              key={p.title}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.6 + i * 0.1 }}
+            >
+              <Link
+                to={p.path}
+                className="group block p-8 rounded-2xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.08] hover:border-white/[0.15] transition-all duration-300 no-underline h-full"
+              >
+                <p.icon className="w-6 h-6 text-rh-red mb-5" />
+                <h3 className="font-display font-bold text-lg text-white mb-3">
+                  {p.title}
+                </h3>
+                <p className="text-sm text-rh-gray-400 leading-relaxed mb-6">
+                  {p.desc}
+                </p>
+                <span className="text-sm font-medium text-rh-red group-hover:text-rh-red-light transition-colors">
+                  {p.label} &rarr;
+                </span>
+              </Link>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
 
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        transition={{ duration: 1, delay: 1.2 }}
+        className="absolute bottom-10 left-1/2 -translate-x-1/2"
       >
         <motion.div
           animate={{ y: [0, 8, 0] }}
-          transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center pt-2"
+          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
+          className="w-6 h-10 border-2 border-white/15 rounded-full flex justify-center pt-2"
         >
-          <div className="w-1 h-2 bg-white/40 rounded-full" />
+          <div className="w-1 h-2 bg-white/30 rounded-full" />
         </motion.div>
       </motion.div>
     </section>
