@@ -207,7 +207,7 @@ function NotebookCard({
     >
       <a
         href={notebook.file ? `${import.meta.env.BASE_URL}${notebook.file}` : undefined}
-        download={notebook.file ? undefined : undefined}
+        download={notebook.file ? notebook.file.split('/').pop() : undefined}
         onClick={notebook.file ? undefined : (e) => e.preventDefault()}
         style={{
           display: 'flex',

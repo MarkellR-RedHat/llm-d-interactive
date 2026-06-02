@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/shared/PageTransition'
 
@@ -225,32 +225,30 @@ interface LineDef {
   to: string
 }
 
-const DIAGRAM_W = 780
-const DIAGRAM_H = 620
+const DIAGRAM_W = 700
+const DIAGRAM_H = 580
 
 const BOXES: BoxDef[] = [
   // Layer 1 - Client
-  { id: 'client', label: 'Client', x: 330, y: 0, w: 120, h: 44 },
+  { id: 'client', label: 'Client', x: 290, y: 0, w: 120, h: 44 },
   // Layer 2 - Envoy
-  { id: 'envoy', label: 'Envoy Proxy', sublabel: 'API Gateway', x: 280, y: 80, w: 220, h: 50 },
+  { id: 'envoy', label: 'Envoy Proxy', sublabel: 'API Gateway', x: 240, y: 80, w: 220, h: 50 },
   // Layer 3 - EPP (prominent)
-  { id: 'epp', label: 'Endpoint Picker', sublabel: 'llm‑d Router', x: 260, y: 170, w: 260, h: 56, accent: true },
-  // Layer 4 - Workers
+  { id: 'epp', label: 'Endpoint Picker', sublabel: 'llm‑d Router', x: 220, y: 170, w: 260, h: 56, accent: true },
+  // Layer 4 - Workers (2 per group)
   { id: 'prefill', label: 'Prefill Worker 1', x: 60, y: 280, w: 140, h: 40, group: 'prefill-group' },
   { id: 'prefill-2', label: 'Prefill Worker 2', x: 60, y: 326, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'prefill-3', label: 'Prefill Worker 3', x: 60, y: 372, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'decode', label: 'Decode Worker 1', x: 580, y: 280, w: 140, h: 40, group: 'decode-group' },
-  { id: 'decode-2', label: 'Decode Worker 2', x: 580, y: 326, w: 140, h: 40, group: 'decode-group' },
-  { id: 'decode-3', label: 'Decode Worker 3', x: 580, y: 372, w: 140, h: 40, group: 'decode-group' },
+  { id: 'decode', label: 'Decode Worker 1', x: 500, y: 280, w: 140, h: 40, group: 'decode-group' },
+  { id: 'decode-2', label: 'Decode Worker 2', x: 500, y: 326, w: 140, h: 40, group: 'decode-group' },
   // Layer 5 - KV Cache
-  { id: 'kv-gpu', label: 'GPU HBM', x: 100, y: 470, w: 160, h: 42 },
-  { id: 'kv-cpu', label: 'CPU DRAM', x: 310, y: 470, w: 160, h: 42 },
-  { id: 'kv-disk', label: 'Disk / NVMe', x: 520, y: 470, w: 160, h: 42 },
-  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 310, y: 540, w: 160, h: 42 },
+  { id: 'kv-gpu', label: 'GPU HBM', x: 80, y: 430, w: 160, h: 42 },
+  { id: 'kv-cpu', label: 'CPU DRAM', x: 270, y: 430, w: 160, h: 42 },
+  { id: 'kv-disk', label: 'Disk / NVMe', x: 460, y: 430, w: 160, h: 42 },
+  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 270, y: 500, w: 160, h: 42 },
   // Side components
   { id: 'autoscaler', label: 'Autoscaler', x: 0, y: 200, w: 130, h: 44 },
-  { id: 'latency-predictor', label: 'Latency Predictor', x: 640, y: 186, w: 140, h: 44 },
-  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 640, y: 240, w: 140, h: 44 },
+  { id: 'latency-predictor', label: 'Latency Predictor', x: 560, y: 170, w: 140, h: 44 },
+  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 560, y: 224, w: 140, h: 44 },
 ]
 
 const LINES: LineDef[] = [
@@ -258,8 +256,8 @@ const LINES: LineDef[] = [
   { from: 'envoy', to: 'epp' },
   { from: 'epp', to: 'prefill' },
   { from: 'epp', to: 'decode' },
-  { from: 'prefill-3', to: 'kv-gpu' },
-  { from: 'decode-3', to: 'kv-disk' },
+  { from: 'prefill-2', to: 'kv-gpu' },
+  { from: 'decode-2', to: 'kv-disk' },
   { from: 'kv-gpu', to: 'kv-cpu' },
   { from: 'kv-cpu', to: 'kv-disk' },
   { from: 'kv-cpu', to: 'kv-indexer' },
@@ -404,7 +402,7 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 580,
+          left: 500,
           top: 258,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
@@ -420,8 +418,8 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 100,
-          top: 445,
+          left: 80,
+          top: 405,
           fontSize: '11px',
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
@@ -436,9 +434,9 @@ function GroupLabels() {
       <div
         style={{
           position: 'absolute',
-          left: 85,
-          top: 460,
-          width: 610,
+          left: 65,
+          top: 420,
+          width: 570,
           height: 135,
           borderRadius: '12px',
           border: `1.5px dashed ${GRAY_200}`,
@@ -773,6 +771,20 @@ function DetailPanel({
 
 export default function Architecture() {
   const [selected, setSelected] = useState<string | null>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [scale, setScale] = useState(1)
+
+  useEffect(() => {
+    const measure = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth
+        setScale(Math.min(1, containerWidth / DIAGRAM_W))
+      }
+    }
+    measure()
+    window.addEventListener('resize', measure)
+    return () => window.removeEventListener('resize', measure)
+  }, [])
 
   const handleSelect = useCallback((id: string) => {
     const dataKey = resolveDataKey(id)
@@ -843,28 +855,40 @@ export default function Architecture() {
               flexWrap: 'wrap',
             }}
           >
-            {/* Diagram area */}
+            {/* Diagram area - responsive scaling */}
             <div
+              ref={containerRef}
               style={{
-                position: 'relative',
-                width: DIAGRAM_W,
-                height: DIAGRAM_H,
+                width: '100%',
+                maxWidth: DIAGRAM_W,
                 flexShrink: 0,
+                overflow: 'visible',
+                height: DIAGRAM_H * scale,
               }}
             >
-              <ConnectionLines selected={selected} />
-              <GroupLabels />
-              {BOXES.map((box) => (
-                <ComponentBox
-                  key={box.id}
-                  box={box}
-                  isSelected={
-                    selectedDataKey !== null &&
-                    resolveDataKey(box.id) === selectedDataKey
-                  }
-                  onSelect={handleSelect}
-                />
-              ))}
+              <div
+                style={{
+                  width: DIAGRAM_W,
+                  height: DIAGRAM_H,
+                  position: 'relative',
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
+                }}
+              >
+                <ConnectionLines selected={selected} />
+                <GroupLabels />
+                {BOXES.map((box) => (
+                  <ComponentBox
+                    key={box.id}
+                    box={box}
+                    isSelected={
+                      selectedDataKey !== null &&
+                      resolveDataKey(box.id) === selectedDataKey
+                    }
+                    onSelect={handleSelect}
+                  />
+                ))}
+              </div>
             </div>
 
             {/* Detail panel */}
