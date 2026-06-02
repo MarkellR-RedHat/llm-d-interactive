@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 export default function HeroSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const animationRef = useRef<number>(0)
-  const mouseRef = useRef({ x: 0, y: 0 })
+  const mouseRef = useRef({ x: -9999, y: -9999 })
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -13,23 +13,29 @@ export default function HeroSection() {
     const ctx = canvas.getContext('2d')
     if (!ctx) return
 
+    let w = 0
+    let h = 0
+
     const resize = () => {
-      canvas.width = canvas.offsetWidth * window.devicePixelRatio
-      canvas.height = canvas.offsetHeight * window.devicePixelRatio
-      ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
+      const dpr = window.devicePixelRatio || 1
+      w = canvas.offsetWidth
+      h = canvas.offsetHeight
+      canvas.width = w * dpr
+      canvas.height = h * dpr
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
     }
     resize()
     window.addEventListener('resize', resize)
 
-    const nodes: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = []
-    for (let i = 0; i < 60; i++) {
+    const count = 90
+    const nodes: { x: number; y: number; vx: number; vy: number; r: number }[] = []
+    for (let i = 0; i < count; i++) {
       nodes.push({
-        x: Math.random() * canvas.offsetWidth,
-        y: Math.random() * canvas.offsetHeight,
-        vx: (Math.random() - 0.5) * 0.3,
-        vy: (Math.random() - 0.5) * 0.3,
-        r: Math.random() * 2.5 + 1,
-        o: Math.random() * 0.25 + 0.08,
+        x: Math.random() * w,
+        y: Math.random() * h,
+        vx: (Math.random() - 0.5) * 0.4,
+        vy: (Math.random() - 0.5) * 0.4,
+        r: Math.random() * 2 + 1,
       })
     }
 
@@ -37,44 +43,63 @@ export default function HeroSection() {
       const rect = canvas.getBoundingClientRect()
       mouseRef.current = { x: e.clientX - rect.left, y: e.clientY - rect.top }
     }
+    const handleLeave = () => {
+      mouseRef.current = { x: -9999, y: -9999 }
+    }
     canvas.addEventListener('mousemove', handleMouse)
+    canvas.addEventListener('mouseleave', handleLeave)
+
+    const connectDist = 150
+    const mouseDist = 200
+    const mouseStrength = 0.0008
 
     const animate = () => {
-      const w = canvas.offsetWidth
-      const h = canvas.offsetHeight
       ctx.clearRect(0, 0, w, h)
-      for (let i = 0; i < nodes.length; i++) {
+
+      for (let i = 0; i < count; i++) {
         const n = nodes[i]
-        n.x += n.vx
-        n.y += n.vy
-        if (n.x < 0 || n.x > w) n.vx *= -1
-        if (n.y < 0 || n.y > h) n.vy *= -1
+
         const dx = mouseRef.current.x - n.x
         const dy = mouseRef.current.y - n.y
         const dist = Math.sqrt(dx * dx + dy * dy)
-        if (dist < 200) {
-          n.vx += dx * (200 - dist) / 200 * 0.00015
-          n.vy += dy * (200 - dist) / 200 * 0.00015
+        if (dist < mouseDist && dist > 0) {
+          const force = (mouseDist - dist) / mouseDist * mouseStrength
+          n.vx += dx * force
+          n.vy += dy * force
         }
-        n.vx *= 0.998
-        n.vy *= 0.998
-        ctx.beginPath()
-        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200, 200, 205, ${n.o})`
-        ctx.fill()
-        for (let j = i + 1; j < nodes.length; j++) {
+
+        n.x += n.vx
+        n.y += n.vy
+        n.vx *= 0.995
+        n.vy *= 0.995
+
+        if (n.x < 0) { n.x = 0; n.vx *= -1 }
+        if (n.x > w) { n.x = w; n.vx *= -1 }
+        if (n.y < 0) { n.y = 0; n.vy *= -1 }
+        if (n.y > h) { n.y = h; n.vy *= -1 }
+
+        for (let j = i + 1; j < count; j++) {
           const m = nodes[j]
-          const cd = Math.sqrt((n.x - m.x) ** 2 + (n.y - m.y) ** 2)
-          if (cd < 180) {
+          const cdx = n.x - m.x
+          const cdy = n.y - m.y
+          const cd = Math.sqrt(cdx * cdx + cdy * cdy)
+          if (cd < connectDist) {
+            const alpha = (1 - cd / connectDist) * 0.25
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
-            ctx.strokeStyle = `rgba(200, 200, 205, ${(1 - cd / 180) * 0.08})`
-            ctx.lineWidth = 0.5
+            ctx.strokeStyle = `rgba(238, 60, 60, ${alpha})`
+            ctx.lineWidth = 0.6
             ctx.stroke()
           }
         }
+
+        ctx.beginPath()
+        ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
+        ctx.fillStyle = 'rgba(255, 100, 100, 0.5)'
+        ctx.fill()
       }
+
       animationRef.current = requestAnimationFrame(animate)
     }
     animate()
@@ -82,6 +107,7 @@ export default function HeroSection() {
     return () => {
       window.removeEventListener('resize', resize)
       canvas.removeEventListener('mousemove', handleMouse)
+      canvas.removeEventListener('mouseleave', handleLeave)
       cancelAnimationFrame(animationRef.current)
     }
   }, [])
@@ -90,14 +116,12 @@ export default function HeroSection() {
     <section
       style={{
         position: 'relative',
-        backgroundColor: '#151515',
         overflow: 'hidden',
-        /* Padding accounts for ~100px header + 100px internal padding per UPenn */
         paddingTop: '200px',
-        paddingBottom: '100px',
+        paddingBottom: '120px',
+        background: 'linear-gradient(135deg, #0C0C0C 0%, #1A0A0A 40%, #1C1010 70%, #111 100%)',
       }}
     >
-      {/* Particle canvas - absolute behind everything, like particles-js */}
       <canvas
         ref={canvasRef}
         style={{
@@ -106,28 +130,41 @@ export default function HeroSection() {
           left: 0,
           width: '100%',
           height: '100%',
-          zIndex: 10,
+          zIndex: 1,
         }}
       />
 
-      {/* Dark overlay on top of particles */}
       <div
         style={{
           position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'rgba(21,21,21,0.75)',
-          zIndex: 11,
+          top: '15%',
+          left: '60%',
+          width: '600px',
+          height: '600px',
+          background: 'radial-gradient(circle, rgba(238,0,0,0.08) 0%, transparent 70%)',
+          borderRadius: '50%',
+          zIndex: 1,
+          pointerEvents: 'none',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: '10%',
+          left: '10%',
+          width: '400px',
+          height: '400px',
+          background: 'radial-gradient(circle, rgba(238,0,0,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          zIndex: 1,
+          pointerEvents: 'none',
         }}
       />
 
-      {/* Content on top */}
       <div
         style={{
           position: 'relative',
-          zIndex: 12,
+          zIndex: 2,
           maxWidth: '1244px',
           margin: '0 auto',
           padding: '0 30px',
@@ -158,7 +195,7 @@ export default function HeroSection() {
           style={{
             fontSize: '20px',
             lineHeight: '32px',
-            color: 'rgba(255,255,255,0.75)',
+            color: 'rgba(255,255,255,0.7)',
             maxWidth: '600px',
             marginBottom: '48px',
           }}
@@ -167,12 +204,10 @@ export default function HeroSection() {
           Kubernetes-native LLM serving platform.
         </motion.p>
 
-        {/* CTA buttons - UPenn style: uppercase, no border-radius, bold */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          className="ctas"
           style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}
         >
           <Link
@@ -185,7 +220,7 @@ export default function HeroSection() {
               fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: '16px',
-              textTransform: 'uppercase',
+              textTransform: 'uppercase' as const,
               borderRadius: '0',
               textDecoration: 'none',
               transition: 'background 0.5s ease',
@@ -206,20 +241,20 @@ export default function HeroSection() {
               fontFamily: 'var(--font-display)',
               fontWeight: 700,
               fontSize: '16px',
-              textTransform: 'uppercase',
+              textTransform: 'uppercase' as const,
               borderRadius: '0',
               textDecoration: 'none',
-              border: '2px solid rgba(255,255,255,0.4)',
+              border: '2px solid rgba(255,255,255,0.3)',
               transition: 'background 0.5s ease, border-color 0.5s ease',
               letterSpacing: '0.03em',
             }}
             onMouseEnter={e => {
-              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.08)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.6)'
             }}
             onMouseLeave={e => {
               e.currentTarget.style.backgroundColor = 'transparent'
-              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.3)'
             }}
           >
             Explore Tools
