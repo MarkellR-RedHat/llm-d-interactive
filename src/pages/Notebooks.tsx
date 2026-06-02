@@ -5,7 +5,7 @@ export default function Notebooks() {
   return (
     <PageTransition>
       <div className="pt-24 min-h-screen bg-white">
-        <div className="max-w-6xl mx-auto px-8 lg:px-12 py-20">
+        <div className="max-w-5xl mx-auto px-8 lg:px-12 py-20">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center">
               <FlaskConical className="w-6 h-6 text-orange-600" />

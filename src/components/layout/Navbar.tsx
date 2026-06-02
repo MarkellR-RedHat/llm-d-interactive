@@ -33,15 +33,16 @@ export default function Navbar() {
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-rh-white/90 backdrop-blur-xl border-b border-rh-gray-100">
-      <div className="max-w-6xl mx-auto px-8 lg:px-12">
+      <div className="max-w-5xl mx-auto px-8 lg:px-12">
         <div className="flex items-center justify-between h-[72px]">
           <Link to="/" className="flex items-center gap-3 no-underline">
             <div className="w-9 h-9 bg-rh-red rounded-lg flex items-center justify-center">
               <span className="text-white font-display font-extrabold text-base">d</span>
             </div>
-            <span className="font-display font-bold text-xl text-rh-black tracking-tight">
-              llm-d
-            </span>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-display font-bold text-xl text-rh-black tracking-tight">llm-d</span>
+              <span className="font-display font-medium text-sm text-rh-gray-500 hidden sm:inline">Learning Center</span>
+            </div>
           </Link>
 
           <div className="hidden lg:flex items-center gap-2">
