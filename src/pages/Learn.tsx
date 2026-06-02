@@ -1,6 +1,9 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/shared/PageTransition'
+import Term from '../components/shared/Term'
+import Expand from '../components/shared/Expand'
+import InteractiveFlow from '../components/shared/InteractiveFlow'
 
 /* ─── Helper Components ─── */
 
@@ -64,65 +67,6 @@ function KeyConcept({ term, children }: { term: string; children: ReactNode }) {
       >
         {children}
       </span>
-    </div>
-  )
-}
-
-function Diagram({ steps }: { steps: string[] }) {
-  return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        padding: '32px 0',
-      }}
-    >
-      {steps.map((step, i) => (
-        <div key={i} style={{ display: 'flex', alignItems: 'stretch' }}>
-          <div
-            style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              marginRight: '20px',
-              minWidth: '24px',
-            }}
-          >
-            <div
-              style={{
-                width: '14px',
-                height: '14px',
-                borderRadius: '50%',
-                backgroundColor: '#EE0000',
-                flexShrink: 0,
-                marginTop: '6px',
-              }}
-            />
-            {i < steps.length - 1 && (
-              <div
-                style={{
-                  width: '2px',
-                  flexGrow: 1,
-                  backgroundColor: '#D2D2D2',
-                  minHeight: '32px',
-                }}
-              />
-            )}
-          </div>
-          <div
-            style={{
-              fontFamily: 'var(--font-body)',
-              fontSize: '17px',
-              lineHeight: '28px',
-              color: '#212121',
-              paddingBottom: i < steps.length - 1 ? '24px' : '0',
-            }}
-          >
-            {step}
-          </div>
-        </div>
-      ))}
     </div>
   )
 }
@@ -229,45 +173,103 @@ function BasicsTab() {
           Each station scales independently based on demand.
         </p>
         <p style={{ marginBottom: '20px' }}>
-          That is what llm&#x2011;d does for large language model inference. Instead
-          of running everything on a single GPU (or a single process), it splits
-          the work into specialized pieces that can each scale on their own.
-          A router directs requests. Prefill workers handle the compute-heavy initial
-          processing. Decode workers generate tokens one at a time. And a shared
-          KV cache acts as the pantry, storing previous work so it can be reused
-          across requests.
+          That is what llm&#x2011;d does for large language model{' '}
+          <Term definition="The process of sending input to a trained model and getting an answer back. It is the 'running' phase, as opposed to the 'training' phase.">inference</Term>.
+          Instead of running everything on a single{' '}
+          <Term definition="Graphics Processing Unit. A specialized processor originally designed for rendering graphics, now widely used for the massive parallel math that powers AI models.">GPU</Term>{' '}
+          (or a single process), it splits the work into specialized pieces that can
+          each scale on their own. A router directs requests.{' '}
+          <Term definition="The first phase of inference, where the model processes all of the input tokens at once. This is the compute-heavy step.">Prefill</Term>{' '}
+          workers handle the compute-heavy initial processing.{' '}
+          <Term definition="The second phase of inference, where the model generates output tokens one at a time. This is the memory-bandwidth-heavy step.">Decode</Term>{' '}
+          workers generate tokens one at a time. And a shared{' '}
+          <Term definition="Key-Value cache. A memory store that saves the intermediate computations (attention keys and values) from previous tokens so the model does not have to redo that work.">KV cache</Term>{' '}
+          acts as the pantry, storing previous work so it can be reused across requests.
         </p>
+        <Expand label="What exactly is a language model?">
+          <p style={{ marginBottom: '16px' }}>
+            A large language model (LLM) is a neural network trained on vast amounts of
+            text. At its core is an architecture called a <strong>transformer</strong>,
+            which uses a mechanism called <strong>attention</strong> to figure out how
+            every word (or sub-word piece, called a <strong>token</strong>) relates to
+            every other word in the input.
+          </p>
+          <p style={{ marginBottom: '16px' }}>
+            When you send a prompt to the model, the text is first split into tokens.
+            The model then runs those tokens through dozens (or hundreds) of layers,
+            each containing attention and feed-forward computations. The output is a
+            probability distribution over the next token, which is sampled to produce
+            the response one token at a time.
+          </p>
+          <p>
+            The "large" in LLM refers to the number of parameters, which can range from
+            a few billion to hundreds of billions. More parameters generally mean better
+            quality, but also more memory and compute to run.
+          </p>
+        </Expand>
       </Section>
 
       <Section title="The key ideas">
         <p style={{ marginBottom: '16px' }}>
           Here is the basic flow of a request through llm&#x2011;d:
         </p>
-        <Diagram
+        <InteractiveFlow
           steps={[
-            'A request comes in from a user or application.',
-            'The router decides which worker should handle it, based on cache state, load, and predicted latency.',
-            'A prefill worker processes the input prompt, converting tokens into internal representations.',
-            'The KV cache stores the computed state so future requests with the same prefix can skip this work.',
-            'A decode worker generates the response tokens one at a time, streaming them back to the caller.',
+            {
+              title: 'A request arrives from a user or application',
+              detail:
+                'The request is an HTTP call to an OpenAI-compatible API endpoint. It contains the prompt text, model parameters (temperature, max tokens), and optionally a conversation history.',
+            },
+            {
+              title: 'The router selects the best worker',
+              detail:
+                'The router examines cache state, current load, and predicted latency across all available workers. It picks the worker most likely to serve this request quickly, for example one that already has a matching prefix cached in memory.',
+            },
+            {
+              title: 'A prefill worker processes the input prompt',
+              detail:
+                'The prefill worker takes every input token and runs it through the model layers in parallel. This is the most compute-intensive step, performing dense matrix multiplications to build the internal representation of your prompt.',
+            },
+            {
+              title: 'The KV cache stores the computed state',
+              detail:
+                'The attention keys and values computed during prefill are saved to the cache. If a future request shares the same prefix (a common system prompt, for example), this work can be skipped entirely, saving significant GPU time.',
+            },
+            {
+              title: 'A decode worker generates the response',
+              detail:
+                'The decode worker produces output tokens one at a time, reading from the KV cache at each step. Each new token is streamed back to the caller immediately, so the user sees the response appear progressively rather than waiting for the entire answer.',
+            },
           ]}
         />
       </Section>
 
       <Section title="Why does this matter?">
         <p style={{ marginBottom: '20px' }}>
-          Large language models are expensive to run. A single high-end GPU can cost
-          thousands of dollars per month. When that GPU sits idle waiting for one
-          part of the pipeline to finish, or when it re-computes work it has already
-          done for a previous request, that is wasted money.
+          Large language models are expensive to run. A single high-end{' '}
+          <Term definition="Graphics Processing Unit. A specialized processor originally designed for rendering graphics, now widely used for the massive parallel math that powers AI models.">GPU</Term>{' '}
+          can cost thousands of dollars per month. When that GPU sits idle waiting
+          for one part of the pipeline to finish, or when it re-computes work it
+          has already done for a previous request, that is wasted money.
         </p>
         <p style={{ marginBottom: '20px' }}>
-          llm&#x2011;d addresses this directly. By disaggregating inference into
-          prefill and decode stages, each can be placed on hardware matched to its
-          workload profile. By sharing a KV cache across workers, repeated prompts
-          (system prompts, common prefixes, multi-turn conversations) avoid redundant
-          computation. By using intelligent routing, requests land on the worker
-          best positioned to serve them quickly.
+          llm&#x2011;d addresses this directly. By disaggregating{' '}
+          <Term definition="The process of sending input to a trained model and getting an answer back. It is the 'running' phase, as opposed to the 'training' phase.">inference</Term>{' '}
+          into{' '}
+          <Term definition="The first phase of inference, where the model processes all of the input tokens at once. This is the compute-heavy step.">prefill</Term>{' '}
+          and{' '}
+          <Term definition="The second phase of inference, where the model generates output tokens one at a time. This is the memory-bandwidth-heavy step.">decode</Term>{' '}
+          stages, each can be placed on hardware matched to its workload profile. By
+          sharing a{' '}
+          <Term definition="Key-Value cache. A memory store that saves the intermediate computations (attention keys and values) from previous tokens so the model does not have to redo that work.">KV cache</Term>{' '}
+          across workers, repeated prompts (system prompts, common prefixes,
+          multi-turn conversations) avoid redundant computation. By using intelligent
+          routing, requests land on the worker best positioned to serve them quickly.
+        </p>
+        <p style={{ marginBottom: '20px' }}>
+          The whole system runs on{' '}
+          <Term definition="An open source container orchestration platform that automates deploying, scaling, and managing containerized applications across clusters of machines.">Kubernetes</Term>,
+          so it integrates with the infrastructure teams already use in production.
         </p>
         <p>
           The result: higher throughput, lower latency, and better GPU utilization,
@@ -284,15 +286,18 @@ function BeginnerTab() {
       <Section title="What is LLM serving?">
         <p style={{ marginBottom: '20px' }}>
           LLM serving is the infrastructure that sits between a trained model and
-          the applications that use it. It handles loading the model onto GPUs,
+          the applications that use it. It handles loading the model onto{' '}
+          <Term definition="Graphics Processing Unit. A specialized processor designed for parallel computation, now the primary hardware used to run AI models.">GPUs</Term>,
           accepting API requests, managing batching, and streaming results back.
         </p>
         <p style={{ marginBottom: '20px' }}>
-          Most serving frameworks (vLLM, TGI, Triton) handle single-node or
-          basic multi-node setups well. llm&#x2011;d adds distributed orchestration
-          on top of vLLM, turning a cluster of GPU nodes into a coordinated serving
-          system with intelligent routing, shared caching, and independent scaling
-          of each component.
+          Most serving frameworks (<Term definition="An open source, high-throughput model serving engine. It implements PagedAttention for efficient memory management and supports continuous batching.">vLLM</Term>,
+          TGI, Triton) handle single-node or basic multi-node setups well.
+          llm&#x2011;d adds distributed orchestration on top of{' '}
+          <Term definition="An open source, high-throughput model serving engine. It implements PagedAttention for efficient memory management and supports continuous batching.">vLLM</Term>,
+          turning a cluster of GPU nodes into a coordinated serving system with
+          intelligent routing, shared caching, and independent scaling of each
+          component.
         </p>
       </Section>
 
@@ -304,38 +309,98 @@ function BeginnerTab() {
           the best worker) and the Proxy (which forwards the request).
         </KeyConcept>
         <KeyConcept term="Prefill Workers">
-          Handle the compute-intensive first phase of inference. They process the
-          entire input prompt at once, computing attention across all input tokens.
-          This is a compute-bound workload that benefits from high FLOPS hardware.
+          Handle the compute-intensive first phase of{' '}
+          <Term definition="The process of running a trained model to generate predictions or responses from input data.">inference</Term>.
+          They process the entire input prompt at once, computing attention across
+          all input{' '}
+          <Term definition="A word or sub-word unit that the model processes. Text is split into tokens before being fed to the model. For example, the word 'unhappiness' might become three tokens: 'un', 'happi', 'ness'.">tokens</Term>.
+          This is a compute-bound workload that benefits from high{' '}
+          <Term definition="Floating Point Operations Per Second. A measure of how fast a processor can perform mathematical calculations.">FLOPS</Term>{' '}
+          hardware.
         </KeyConcept>
         <KeyConcept term="Decode Workers">
-          Handle the memory-bandwidth-intensive second phase. They generate output
-          tokens one at a time, reading from the KV cache at each step. This workload
-          is bound by memory bandwidth rather than raw compute.
+          Handle the memory-bandwidth-intensive second phase. They generate output{' '}
+          <Term definition="A word or sub-word unit that the model processes. Text is split into tokens before being fed to the model. For example, the word 'unhappiness' might become three tokens: 'un', 'happi', 'ness'.">tokens</Term>{' '}
+          one at a time, reading from the{' '}
+          <Term definition="Key-Value cache. Stores the attention keys and values computed during inference so they can be reused for subsequent tokens instead of being recomputed.">KV cache</Term>{' '}
+          at each step. This workload is bound by memory bandwidth rather than raw
+          compute.
         </KeyConcept>
         <KeyConcept term="KV Cache">
-          A hierarchical storage system spanning GPU HBM, CPU DRAM, and disk. A global
-          index tracks which prefixes exist across the entire cluster, enabling
-          cache-aware routing decisions. Previously computed KV states can be reused
-          by any worker that needs them.
+          A hierarchical storage system spanning GPU HBM, CPU DRAM, and disk. A
+          global index tracks which prefixes exist across the entire cluster,
+          enabling cache-aware routing decisions. Previously computed KV states
+          can be reused by any worker that needs them.
         </KeyConcept>
         <KeyConcept term="Autoscaler">
-          Scales prefill and decode worker pools independently based on SLO targets
-          and inference-specific signals. Supports scale-to-zero for cost optimization
-          when models are idle.
+          <Term definition="Automatically adding or removing worker instances in response to changes in demand, so resources are neither wasted nor overwhelmed.">Autoscaling</Term>{' '}
+          for{' '}
+          <Term definition="The first phase of inference, where the model processes all of the input tokens at once.">prefill</Term>{' '}
+          and{' '}
+          <Term definition="The second phase of inference, where the model generates output tokens one at a time.">decode</Term>{' '}
+          worker pools independently based on{' '}
+          <Term definition="Service Level Objective. A measurable target for system performance, such as 'p99 time-to-first-token under 500ms'.">SLO</Term>{' '}
+          targets and inference-specific signals. Supports scale-to-zero for cost
+          optimization when models are idle.
         </KeyConcept>
+        <Expand label="How do prefill and decode differ at the hardware level?">
+          <p style={{ marginBottom: '16px' }}>
+            <strong><Term definition="The first phase of inference, where the model processes all of the input tokens at once.">Prefill</Term></strong>{' '}
+            is compute-bound. It performs dense matrix multiplications over every
+            input token simultaneously. The bottleneck is how many floating-point
+            operations the GPU can execute per second. High-FLOPS accelerators (like
+            NVIDIA B200) excel here.
+          </p>
+          <p>
+            <strong><Term definition="The second phase of inference, where the model generates output tokens one at a time.">Decode</Term></strong>{' '}
+            is memory-bandwidth-bound. For each new token, the model must read the
+            entire{' '}
+            <Term definition="Key-Value cache. Stores the attention keys and values computed during inference so they can be reused for subsequent tokens instead of being recomputed.">KV cache</Term>{' '}
+            from GPU memory. The bottleneck is how fast data can be read from
+            memory, not how fast the GPU can compute. GPUs with higher memory
+            bandwidth (measured in TB/s) produce tokens faster.
+          </p>
+        </Expand>
       </Section>
 
       <Section title="How a request flows">
-        <Diagram
+        <InteractiveFlow
           steps={[
-            'Client sends a prompt via the OpenAI-compatible API.',
-            'Router checks the global KV cache index for matching prefixes.',
-            'Endpoint Picker selects the best worker based on the active routing policy (cache hit, current load, predicted latency).',
-            'Prefill worker processes all input tokens, computing attention representations.',
-            'Computed KV state is stored in the global cache and indexed for future reuse.',
-            'Decode worker generates output tokens one at a time, reading from the KV cache at each step.',
-            'Response streams back through the router to the client via SSE.',
+            {
+              title: 'Client sends a prompt via the OpenAI-compatible API',
+              detail:
+                'The request uses the same format as OpenAI\'s chat completions endpoint, so existing applications can switch to llm‑d without code changes. The body includes the messages array, model name, and generation parameters.',
+            },
+            {
+              title: 'Router checks the global KV cache index for matching prefixes',
+              detail:
+                'The router maintains an index of which prefixes are cached on which workers. A prefix is a sequence of tokens that matches the start of the incoming prompt, such as a system prompt shared across many requests.',
+            },
+            {
+              title: 'Endpoint Picker selects the best worker',
+              detail:
+                'Based on the active routing policy (cache hit, current load, or predicted latency), the Endpoint Picker chooses the worker most likely to serve this request quickly and forwards it via the Proxy.',
+            },
+            {
+              title: 'Prefill worker processes all input tokens',
+              detail:
+                'The prefill worker runs every input token through the model\'s attention layers in parallel. This step computes the internal representations the model needs to begin generating a response.',
+            },
+            {
+              title: 'Computed KV state is stored and indexed for reuse',
+              detail:
+                'The attention keys and values are written to the hierarchical cache and registered in the global index. Any future request with a matching prefix can skip this computation entirely.',
+            },
+            {
+              title: 'Decode worker generates output tokens one at a time',
+              detail:
+                'The decode worker reads from the KV cache at each step and produces one new token. Each token is sampled from a probability distribution, and the process repeats until the model produces a stop token or hits the maximum length.',
+            },
+            {
+              title: 'Response streams back to the client via SSE',
+              detail:
+                'Server-Sent Events deliver each token to the client as soon as it is generated. The user sees the response appear word by word rather than waiting for the entire answer to finish.',
+            },
           ]}
         />
       </Section>
@@ -344,14 +409,66 @@ function BeginnerTab() {
         <ComparisonTable
           headers={['Capability', 'vLLM Alone', 'vLLM + llm‑d']}
           rows={[
-            ['Routing', 'Round-robin or random', 'Prefix-cache-aware, load-aware, predicted-latency'],
-            ['KV Cache', 'Local to each instance', 'Hierarchical (GPU/CPU/disk) with global index'],
-            ['Scaling', 'Manual replica count', 'SLO-aware autoscaling, scale-to-zero'],
-            ['Prefill / Decode split', 'Combined on same GPU', 'Disaggregated, independently scalable'],
-            ['Multi-tenant', 'Separate deployments', 'Shared cluster with LoRA-aware routing'],
-            ['Deployment', 'Single process or basic TP', 'Kubernetes-native with Helm charts and operators'],
+            [
+              'Routing',
+              'Round-robin or random',
+              'Prefix-cache-aware, load-aware, predicted-latency',
+            ],
+            [
+              'KV Cache',
+              'Local to each instance',
+              'Hierarchical (GPU/CPU/disk) with global index',
+            ],
+            [
+              'Scaling',
+              'Manual replica count',
+              'SLO-aware autoscaling, scale-to-zero',
+            ],
+            [
+              'Prefill / Decode split',
+              'Combined on same GPU',
+              'Disaggregated, independently scalable',
+            ],
+            [
+              'Multi-tenant',
+              'Separate deployments',
+              'Shared cluster with LoRA-aware routing',
+            ],
+            [
+              'Deployment',
+              'Single process or basic TP',
+              'Kubernetes-native with Helm charts and operators',
+            ],
           ]}
         />
+        <Expand label="When should I use llm&#x2011;d vs. plain vLLM?">
+          <p style={{ marginBottom: '16px' }}>
+            <strong>Use plain <Term definition="An open source, high-throughput model serving engine. It implements PagedAttention for efficient memory management and supports continuous batching.">vLLM</Term></strong>{' '}
+            when you have a single GPU or a small number of GPUs, low request volume,
+            and a single model to serve. vLLM handles batching and memory management
+            well on its own.
+          </p>
+          <p style={{ marginBottom: '16px' }}>
+            <strong>Use llm&#x2011;d</strong> when you need to serve at scale across
+            many GPUs, want cache-aware routing to avoid redundant computation,
+            need independent scaling of{' '}
+            <Term definition="The first phase of inference, where the model processes all of the input tokens at once.">prefill</Term>{' '}
+            and{' '}
+            <Term definition="The second phase of inference, where the model generates output tokens one at a time.">decode</Term>,
+            or are running multiple models/
+            <Term definition="Low-Rank Adaptation. A lightweight fine-tuning method that trains a small set of additional parameters instead of modifying the full model weights.">LoRA</Term>{' '}
+            adapters on shared infrastructure.
+          </p>
+          <p>
+            The deployment path uses{' '}
+            <Term definition="An open source container orchestration platform that automates deploying, scaling, and managing containerized applications across clusters of machines.">Kubernetes</Term>{' '}
+            with{' '}
+            <Term definition="A package manager for Kubernetes that bundles configuration files into reusable 'charts' for easy deployment.">Helm</Term>{' '}
+            charts or{' '}
+            <Term definition="A Kubernetes-native configuration customization tool that lets you patch and overlay YAML manifests without modifying the originals.">kustomize</Term>{' '}
+            overlays, so it fits into existing cluster workflows.
+          </p>
+        </Expand>
       </Section>
     </div>
   )
@@ -364,10 +481,11 @@ function IntermediateTab() {
         <p style={{ marginBottom: '20px' }}>
           Prefill and decode have fundamentally different hardware requirements.
           Prefill processes the entire input sequence at once, performing dense
-          matrix multiplications across all tokens. This is compute-bound: more
-          FLOPS means faster prefill. Decode generates one token at a time, reading
-          the full KV cache at each step. This is memory-bandwidth-bound: faster
-          memory access means faster decode.
+          matrix multiplications across all tokens. This is compute-bound: more{' '}
+          <Term definition="Floating Point Operations Per Second. A measure of raw computational throughput, typically quoted in teraFLOPS (TFLOPS) for modern GPUs.">FLOPS</Term>{' '}
+          means faster prefill. Decode generates one token at a time, reading the
+          full KV cache at each step. This is memory-bandwidth-bound: faster memory
+          access means faster decode.
         </p>
         <p style={{ marginBottom: '20px' }}>
           When both phases share the same GPU, they contend for resources. A long
@@ -384,6 +502,26 @@ function IntermediateTab() {
           per second. This configuration demonstrates near-linear scaling with
           disaggregated pools.
         </KeyConcept>
+        <Expand label="What if my GPUs are all the same type?">
+          <p style={{ marginBottom: '16px' }}>
+            Disaggregation still helps even with homogeneous hardware. The benefit
+            is not just about matching different GPU types to different workloads.
+            It is also about eliminating contention.
+          </p>
+          <p style={{ marginBottom: '16px' }}>
+            When prefill and decode share a GPU, a long prefill (from a large
+            prompt) blocks the decode loop for all in-flight requests on that GPU.
+            This causes latency spikes for users who are mid-response. With
+            disaggregation, decode workers are never interrupted by incoming
+            prefill work.
+          </p>
+          <p>
+            Additionally, you can scale each pool independently. During peak hours,
+            you might need more prefill workers to absorb a burst of new requests
+            while decode demand stays steady. With a combined setup, you would have
+            to scale everything together, wasting resources.
+          </p>
+        </Expand>
       </Section>
 
       <Section title="Routing policies explained">
@@ -391,7 +529,9 @@ function IntermediateTab() {
           Directs requests to workers that already have matching KV cache entries
           for the prompt prefix. By reusing cached state instead of re-computing it,
           this policy achieves approximately 3x throughput improvement and 2x
-          time-to-first-token reduction compared to round-robin routing.
+          time-to-first-token reduction compared to{' '}
+          <Term definition="A simple load-balancing strategy that distributes requests evenly to each server in turn, without considering cache state or current load.">round-robin</Term>{' '}
+          routing.
         </KeyConcept>
         <KeyConcept term="Load-aware routing">
           Monitors queue depth and utilization across workers, steering new requests
@@ -399,17 +539,21 @@ function IntermediateTab() {
           latencies across the cluster.
         </KeyConcept>
         <KeyConcept term="Predicted-latency routing">
-          Uses an XGBoost model trained on request characteristics (token count,
-          cache hit ratio, current queue state) to predict per-worker latency for
-          each incoming request. Routes to the worker with the lowest predicted
-          completion time. In benchmarks, this achieves approximately 40% reduction
-          in both time-to-first-token and inter-token latency. Supports SLO headers
+          Uses an{' '}
+          <Term definition="A gradient-boosted decision tree algorithm commonly used for tabular prediction tasks. Here it is trained to predict request latency from features like token count, cache hit ratio, and queue depth.">XGBoost</Term>{' '}
+          model trained on request characteristics (token count, cache hit ratio,
+          current queue state) to predict per-worker latency for each incoming
+          request. Routes to the worker with the lowest predicted completion time.
+          In benchmarks, this achieves approximately 40% reduction in both
+          time-to-first-token and inter-token latency. Supports{' '}
+          <Term definition="HTTP headers attached to a request that specify per-request latency targets, allowing the router to make routing decisions that respect the caller's specific performance requirements.">SLO headers</Term>{' '}
           for per-request latency targets.
         </KeyConcept>
         <KeyConcept term="Cache-aware LoRA routing">
-          For multi-tenant deployments using LoRA adapters, this policy routes
-          requests to workers that already have the required adapter loaded,
-          avoiding adapter swap overhead.
+          For multi-tenant deployments using{' '}
+          <Term definition="Low-Rank Adaptation. A lightweight fine-tuning method that trains a small set of additional parameters (adapters) instead of modifying the full model weights. Multiple LoRA adapters can share a single base model.">LoRA</Term>{' '}
+          adapters, this policy routes requests to workers that already have the
+          required adapter loaded, avoiding adapter swap overhead.
         </KeyConcept>
       </Section>
 
@@ -418,20 +562,25 @@ function IntermediateTab() {
           The KV cache in llm&#x2011;d is organized into three tiers, each trading
           off speed for capacity:
         </p>
-        <KeyConcept term="Tier 1: GPU HBM">
-          Fastest access (terabytes/sec bandwidth), smallest capacity (tens of GB
-          per device). Hot prefixes and in-flight request state live here.
-        </KeyConcept>
-        <KeyConcept term="Tier 2: CPU DRAM">
-          High capacity (hundreds of GB per node), moderate bandwidth. Warm prefixes
-          that have been evicted from GPU memory are held here, avoiding a full
-          recompute on cache miss.
-        </KeyConcept>
-        <KeyConcept term="Tier 3: Disk / NVMe">
-          Very high capacity (terabytes), lowest bandwidth. Cold prefixes and
-          long-lived conversational state are persisted here for retrieval when
-          sessions resume.
-        </KeyConcept>
+        <InteractiveFlow
+          steps={[
+            {
+              title: 'Tier 1: GPU HBM',
+              detail:
+                'HBM (High-Bandwidth Memory) is memory stacked directly on the GPU die, delivering terabytes per second of bandwidth. Capacity is limited to tens of GB per device. Hot prefixes and in-flight request state live here. This is the fastest tier, but entries are evicted first when memory pressure rises.',
+            },
+            {
+              title: 'Tier 2: CPU DRAM',
+              detail:
+                'DRAM (Dynamic Random Access Memory) is the system RAM on the host machine. It offers hundreds of GB per node at moderate bandwidth. Warm prefixes evicted from GPU memory are held here, avoiding a full recompute on cache miss. Restoring from DRAM is much faster than rerunning prefill.',
+            },
+            {
+              title: 'Tier 3: Disk / NVMe',
+              detail:
+                'NVMe (Non-Volatile Memory Express) solid-state drives provide terabytes of capacity at the lowest bandwidth tier. Cold prefixes and long-lived conversational state are persisted here for retrieval when sessions resume after being idle. This tier is crucial for multi-turn conversations that span hours or days.',
+            },
+          ]}
+        />
         <p style={{ marginTop: '20px', marginBottom: '20px' }}>
           A global index tracks which prefixes reside on which tier and which node,
           enabling the router to make cache-aware decisions across the entire cluster.
@@ -505,11 +654,21 @@ function AdvancedTab() {
             '  Secrets: model registry credentials, TLS certs',
           ]}
         />
-        <p>
+        <p style={{ marginBottom: '20px' }}>
           The router runs as a standard Deployment (stateless, horizontally scalable).
-          Prefill and decode pools run as StatefulSets with persistent volume claims
-          for local model caching. The autoscaler watches latency metrics from the
-          router and adjusts replica counts per pool.
+          Prefill and decode pools run as{' '}
+          <Term definition="A Kubernetes workload resource designed for applications that need stable network identities and persistent storage. Each pod gets a unique, stable hostname (e.g. prefill-0, prefill-1) that survives restarts.">StatefulSets</Term>{' '}
+          with persistent volume claims for local model caching. The autoscaler
+          watches latency metrics from the router and adjusts replica counts per pool.
+        </p>
+        <p>
+          Configuration is stored in{' '}
+          <Term definition="A Kubernetes object that stores non-confidential configuration data as key-value pairs. Pods can consume ConfigMaps as environment variables, command-line arguments, or mounted files.">ConfigMaps</Term>{' '}
+          (model config, routing policy, SLO targets) and Secrets (model registry
+          credentials, TLS certs). A{' '}
+          <Term definition="A Kubernetes controller that ensures a copy of a specific pod runs on every node (or a selected subset of nodes) in the cluster. Useful for node-level agents like log collectors or monitoring daemons.">DaemonSet</Term>{' '}
+          can optionally run a monitoring agent on each node for fine-grained
+          hardware telemetry.
         </p>
       </Section>
 
@@ -530,10 +689,34 @@ function AdvancedTab() {
         <KeyConcept term="Scale-to-zero">
           Models with intermittent traffic can scale to zero replicas when idle.
           On the next request, the autoscaler provisions workers, loads the model,
-          and serves the request. Cold start time depends on model size and storage
-          backend. This is particularly useful for development, staging, and
-          low-traffic LoRA adapters.
+          and serves the request.{' '}
+          <Term definition="The delay experienced when a service scales from zero replicas to one. The system must allocate a GPU, load model weights into memory, and warm up before serving the first request.">Cold start</Term>{' '}
+          time depends on model size and storage backend. This is particularly
+          useful for development, staging, and low-traffic{' '}
+          <Term definition="Low-Rank Adaptation. A lightweight fine-tuning method that trains a small set of additional parameters instead of modifying the full model weights.">LoRA</Term>{' '}
+          adapters.
         </KeyConcept>
+        <Expand label="How does the workload-variant autoscaler choose between model variants?">
+          <p style={{ marginBottom: '16px' }}>
+            The workload-variant autoscaler solves a constrained optimization problem.
+            It takes as input the current per-model SLO targets, the observed latency
+            and throughput for each model, and the available GPU resources across the
+            cluster.
+          </p>
+          <p style={{ marginBottom: '16px' }}>
+            When demand for one model drops, the autoscaler checks whether releasing
+            those GPUs and reassigning them to an overloaded model pool would lower
+            overall cost while still meeting all SLO targets. On heterogeneous
+            hardware, it also considers which GPU type best matches each model's
+            workload profile (compute-heavy models on high-FLOPS GPUs, bandwidth-heavy
+            decode on high-bandwidth GPUs).
+          </p>
+          <p>
+            The result is a dynamic allocation that continuously rebalances across
+            models, rather than requiring operators to manually partition GPU resources
+            per model.
+          </p>
+        </Expand>
       </Section>
 
       <Section title="Performance benchmarks">
@@ -552,15 +735,36 @@ function AdvancedTab() {
             ['B200, DeepSeek (MoE)', 'Per-GPU throughput', '~3,100 tok/s/GPU'],
           ]}
         />
+        <Expand label="How were these benchmarks measured?">
+          <p style={{ marginBottom: '16px' }}>
+            Throughput benchmarks use a sustained load test that sends requests at
+            increasing rates until the system reaches saturation. The reported
+            throughput is the maximum rate at which all requests complete within
+            the configured SLO window.
+          </p>
+          <p style={{ marginBottom: '16px' }}>
+            Latency benchmarks (TTFT and ITL reductions) compare routing policies
+            against a round-robin baseline under identical hardware, model, and load
+            conditions. The workload mix uses representative prompt lengths and output
+            lengths drawn from production traffic distributions.
+          </p>
+          <p>
+            The hierarchical cache benchmark (13.9x) measures sustained throughput
+            at 250 concurrent users over a 30-minute window. The baseline uses only
+            GPU-resident KV cache with no CPU or disk tiers. Both runs use identical
+            hardware and prompt distributions.
+          </p>
+        </Expand>
       </Section>
 
       <Section title="Mixture-of-Experts support">
         <p style={{ marginBottom: '20px' }}>
-          Large Mixture-of-Experts (MoE) models like the DeepSeek family present
-          unique serving challenges. Only a subset of experts activate per token,
-          but all expert weights must be resident in memory. This makes the
-          memory footprint large relative to the compute actually used per
-          forward pass.
+          Large{' '}
+          <Term definition="Mixture of Experts. A model architecture where only a subset of the model's parameters (called 'experts') activate for each token. This allows very large models to remain computationally efficient, since most experts are idle for any given input.">MoE</Term>{' '}
+          models like the DeepSeek family present unique serving challenges. Only
+          a subset of experts activate per token, but all expert weights must be
+          resident in memory. This makes the memory footprint large relative to
+          the compute actually used per forward pass.
         </p>
         <p style={{ marginBottom: '20px' }}>
           llm&#x2011;d supports wide expert-parallelism for MoE architectures,
@@ -577,18 +781,23 @@ function AdvancedTab() {
 
       <Section title="Transport and high availability">
         <KeyConcept term="UCCL transport">
-          llm&#x2011;d integrates with UCCL (Unified Collective Communication
-          Library) for high-performance inter-node communication during
-          tensor-parallel and expert-parallel inference. UCCL optimizes collective
-          operations (all-reduce, all-gather) across GPU interconnects, minimizing
-          communication overhead in multi-node deployments.
+          llm&#x2011;d integrates with{' '}
+          <Term definition="Unified Collective Communication Library. A high-performance communication library that optimizes collective operations (all-reduce, all-gather) across GPU interconnects for multi-node inference.">UCCL</Term>{' '}
+          for high-performance inter-node communication during tensor-parallel and
+          expert-parallel inference. It optimizes collective operations across GPU
+          interconnects, including{' '}
+          <Term definition="A high-speed networking technology commonly used in HPC and AI clusters. InfiniBand provides very low latency and high bandwidth for inter-node GPU communication.">InfiniBand</Term>{' '}
+          and{' '}
+          <Term definition="RDMA over Converged Ethernet. A protocol that enables remote direct memory access over standard Ethernet networks, providing InfiniBand-like performance without specialized networking hardware.">RoCE RDMA</Term>{' '}
+          fabrics, minimizing communication overhead in multi-node deployments.
         </KeyConcept>
         <KeyConcept term="Active-active router HA">
-          The router supports active-active high availability. Multiple router
-          replicas run concurrently behind a load balancer, each maintaining an
-          up-to-date view of worker health and cache state. If a router instance
-          fails, traffic is seamlessly handled by the remaining replicas with no
-          request loss or cache index staleness.
+          The router supports{' '}
+          <Term definition="A high-availability configuration where all instances actively serve traffic simultaneously, rather than having a standby instance waiting to take over on failure.">active-active HA</Term>.
+          Multiple router replicas run concurrently behind a load balancer, each
+          maintaining an up-to-date view of worker health and cache state. If a
+          router instance fails, traffic is seamlessly handled by the remaining
+          replicas with no request loss or cache index staleness.
         </KeyConcept>
       </Section>
     </div>
