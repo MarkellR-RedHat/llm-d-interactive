@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, type ReactNode } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import PageTransition from '../components/shared/PageTransition'
+import DocChatbot from '../components/shared/DocChatbot'
 import Term from '../components/shared/Term'
 import Expand from '../components/shared/Expand'
 import InteractiveFlow from '../components/shared/InteractiveFlow'
@@ -985,6 +986,7 @@ export default function Learn() {
           </div>
         </div>
       </div>
+      <DocChatbot />
     </PageTransition>
   )
 }
