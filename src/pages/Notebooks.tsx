@@ -41,6 +41,7 @@ const categories: Category[] = [
           'Set up Grafana with the llm‑d dashboard recipes, monitor queue depth, cache hit rates, and per-replica metrics in real time.',
         difficulty: 'Beginner',
         time: '30 min',
+        file: 'notebooks/07-router-dashboard.ipynb',
       },
     ],
   },
@@ -61,6 +62,7 @@ const categories: Category[] = [
           'Enable event-driven KV-cache indexing via ZMQ for exact block-level cache scoring instead of heuristic estimation. Measure the improvement on multi-turn workloads.',
         difficulty: 'Intermediate',
         time: '60 min',
+        file: 'notebooks/08-precise-prefix-cache.ipynb',
       },
       {
         title: 'Predicted Latency-Based Routing',
@@ -68,6 +70,7 @@ const categories: Category[] = [
           'Train the XGBoost latency predictor on live traffic and route requests to the replica predicted to serve them fastest. Compare against heuristic routing on mixed workloads.',
         difficulty: 'Advanced',
         time: '60 min',
+        file: 'notebooks/09-predicted-latency.ipynb',
       },
     ],
   },
@@ -88,6 +91,7 @@ const categories: Category[] = [
           'Configure hierarchical KV cache offloading (GPU to CPU to disk) and measure effective cache capacity expansion on multi-turn workloads.',
         difficulty: 'Intermediate',
         time: '60 min',
+        file: 'notebooks/10-tiered-prefix-cache.ipynb',
       },
       {
         title: 'Wide Expert-Parallelism for DeepSeek-R1',
@@ -95,6 +99,7 @@ const categories: Category[] = [
           'Deploy DeepSeek-R1 across multiple nodes using LeaderWorkerSet with combined DP/EP configuration.',
         difficulty: 'Advanced',
         time: '90 min',
+        file: 'notebooks/11-wide-ep-deepseek.ipynb',
       },
     ],
   },
@@ -123,6 +128,7 @@ const categories: Category[] = [
           'Perform an incremental rollout of a new LoRA adapter using traffic splitting and gradual deployment. Monitor for regressions during the rollout.',
         difficulty: 'Advanced',
         time: '45 min',
+        file: 'notebooks/12-lora-rollouts.ipynb',
       },
     ],
   },
@@ -135,6 +141,7 @@ const categories: Category[] = [
           'Set up the Async Processor to pull inference requests from a Redis queue with flow-control gating. Ideal for batch workloads.',
         difficulty: 'Advanced',
         time: '60 min',
+        file: 'notebooks/13-async-processing.ipynb',
       },
       {
         title: 'Batch Inference via the Batch Gateway',
@@ -142,6 +149,28 @@ const categories: Category[] = [
           'Submit, track, and manage batch jobs via the OpenAI-compatible /v1/batches API. Co-locate batch and interactive workloads on shared infrastructure.',
         difficulty: 'Advanced',
         time: '45 min',
+        file: 'notebooks/14-batch-gateway.ipynb',
+      },
+    ],
+  },
+  {
+    heading: 'Video Demos (June 2026)',
+    notebooks: [
+      {
+        title: 'Deploy llm‑d on Kubernetes in 15 Minutes',
+        description:
+          'Fast-paced quickstart from zero to serving requests. Covers repo setup, gateway prerequisites, model server deployment (Qwen3-0.6B), router deployment, verification, and first request. Includes timing annotations for each step.',
+        difficulty: 'Beginner' as const,
+        time: '15 min',
+        file: 'notebooks/demo-deploy-15min.ipynb',
+      },
+      {
+        title: 'KV-Cache Optimization: Distributed AI Inference Strategy',
+        description:
+          'Deep dive into all KV cache features. Starts with a baseline, then progressively enables prefix-cache routing, precise indexing, CPU offloading, and disk offloading. Compares all configurations side-by-side.',
+        difficulty: 'Intermediate' as const,
+        time: '45 min',
+        file: 'notebooks/demo-kv-cache-optimization.ipynb',
       },
     ],
   },
