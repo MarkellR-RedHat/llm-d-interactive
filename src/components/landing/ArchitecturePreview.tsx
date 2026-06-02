@@ -36,98 +36,129 @@ export default function ArchitecturePreview() {
 
   return (
     <section style={{ backgroundColor: '#f7f7f7', padding: '100px 0' }}>
-      <div ref={ref} style={{ maxWidth: '1060px', margin: '0 auto', padding: '0 40px' }}>
+      <div ref={ref} style={{ maxWidth: '1244px', margin: '0 auto', padding: '0 30px' }}>
+        {/* Two-column fifty-fifty layout: diagram left (40%), description right (60%) */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.4 }}
-          style={{ marginBottom: '64px' }}
+          transition={{ duration: 0.5 }}
+          style={{
+            display: 'flex',
+            flexWrap: 'wrap',
+            alignItems: 'flex-start',
+            gap: '60px',
+          }}
+          className="arch-layout"
         >
-          <h2
-            className="font-display"
-            style={{ fontSize: '2rem', fontWeight: 700, color: '#151515', marginBottom: '16px' }}
-          >
-            How llm-d works
-          </h2>
-          <p style={{ fontSize: '1.05rem', color: '#4D4D4D', lineHeight: 1.7, maxWidth: '560px' }}>
-            llm-d separates prefill and decode into independent workers that scale separately,
-            connected through a shared KV cache. Hover over each component to learn more.
-          </p>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.5, delay: 0.15 }}
-          style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: '60px', alignItems: 'start' }}
-          className="arch-grid"
-        >
-          <div style={{ backgroundColor: '#fff', borderRadius: '12px', padding: '48px' }}>
-            <svg viewBox="0 0 100 88" style={{ width: '100%', height: 'auto' }}>
-              {connections.map(conn => {
-                const from = components.find(c => c.id === conn.from)!
-                const to = components.find(c => c.id === conn.to)!
-                const lit = hovered === conn.from || hovered === conn.to
-                return (
-                  <line
-                    key={`${conn.from}-${conn.to}`}
-                    x1={from.x} y1={from.y + 6} x2={to.x} y2={to.y - 6}
-                    stroke={lit ? '#EE0000' : '#D2D2D2'}
-                    strokeWidth={lit ? 0.4 : 0.2}
-                    strokeDasharray={lit ? '' : '1.5 1.5'}
-                  />
-                )
-              })}
-              {components.map(comp => {
-                const isHovered = hovered === comp.id
-                return (
-                  <g
-                    key={comp.id}
-                    onMouseEnter={() => setHovered(comp.id)}
-                    onMouseLeave={() => setHovered(null)}
-                    style={{ cursor: 'pointer' }}
-                  >
-                    <rect
-                      x={comp.x - 16} y={comp.y - 5.5} width={32} height={11} rx={2}
-                      fill={isHovered ? comp.color : 'white'}
-                      stroke={comp.color} strokeWidth={0.3}
+          {/* Left: diagram (40%) */}
+          <div className="arch-diagram" style={{ flex: '0 0 40%', maxWidth: '40%' }}>
+            <div style={{ backgroundColor: '#fff', padding: '48px', borderRadius: '0' }}>
+              <svg viewBox="0 0 100 88" style={{ width: '100%', height: 'auto' }}>
+                {connections.map(conn => {
+                  const from = components.find(c => c.id === conn.from)!
+                  const to = components.find(c => c.id === conn.to)!
+                  const lit = hovered === conn.from || hovered === conn.to
+                  return (
+                    <line
+                      key={`${conn.from}-${conn.to}`}
+                      x1={from.x} y1={from.y + 6} x2={to.x} y2={to.y - 6}
+                      stroke={lit ? '#EE0000' : '#D2D2D2'}
+                      strokeWidth={lit ? 0.4 : 0.2}
+                      strokeDasharray={lit ? '' : '1.5 1.5'}
                     />
-                    <text
-                      x={comp.x} y={comp.y + 1.5} textAnchor="middle"
-                      fontSize={2.4} fontWeight={600}
-                      fill={isHovered ? 'white' : comp.color}
-                      fontFamily="Red Hat Display, sans-serif"
+                  )
+                })}
+                {components.map(comp => {
+                  const isActive = hovered === comp.id
+                  return (
+                    <g
+                      key={comp.id}
+                      onMouseEnter={() => setHovered(comp.id)}
+                      onMouseLeave={() => setHovered(null)}
+                      style={{ cursor: 'pointer' }}
                     >
-                      {comp.label}
-                    </text>
-                  </g>
-                )
-              })}
-            </svg>
+                      <rect
+                        x={comp.x - 16} y={comp.y - 5.5} width={32} height={11} rx={2}
+                        fill={isActive ? comp.color : 'white'}
+                        stroke={comp.color} strokeWidth={0.3}
+                      />
+                      <text
+                        x={comp.x} y={comp.y + 1.5} textAnchor="middle"
+                        fontSize={2.4} fontWeight={600}
+                        fill={isActive ? 'white' : comp.color}
+                        fontFamily="Red Hat Display, sans-serif"
+                      >
+                        {comp.label}
+                      </text>
+                    </g>
+                  )
+                })}
+              </svg>
+            </div>
           </div>
 
-          <div style={{ paddingTop: '24px' }}>
+          {/* Right: description (60%) */}
+          <div className="arch-content" style={{ flex: '1', minWidth: '0' }}>
+            <h2
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontSize: '44px',
+                lineHeight: '110%',
+                fontWeight: 600,
+                color: '#151515',
+                marginBottom: '20px',
+              }}
+            >
+              How llm-d works
+            </h2>
+            <p style={{ fontSize: '18px', color: '#4D4D4D', lineHeight: '28px', marginBottom: '40px', maxWidth: '560px' }}>
+              llm-d separates prefill and decode into independent workers that scale separately,
+              connected through a shared KV cache. Hover over each component to learn more.
+            </p>
+
             {active ? (
               <motion.div key={active.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
-                <div style={{ width: '12px', height: '12px', borderRadius: '50%', backgroundColor: active.color, marginBottom: '20px' }} />
-                <h3 className="font-display" style={{ fontSize: '1.2rem', fontWeight: 700, color: '#151515', marginBottom: '16px' }}>
+                <div style={{ width: '14px', height: '14px', borderRadius: '50%', backgroundColor: active.color, marginBottom: '20px' }} />
+                <h3
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    color: '#151515',
+                    marginBottom: '16px',
+                  }}
+                >
                   {active.label}
                 </h3>
-                <p style={{ fontSize: '0.95rem', color: '#4D4D4D', lineHeight: 1.75 }}>
+                <p style={{ fontSize: '16px', color: '#4D4D4D', lineHeight: '26px' }}>
                   {active.description}
                 </p>
               </motion.div>
             ) : (
               <div>
-                <p style={{ fontSize: '0.95rem', color: '#6A6E73', lineHeight: 1.75, marginBottom: '32px' }}>
+                <p style={{ fontSize: '16px', color: '#6A6E73', lineHeight: '26px', marginBottom: '32px' }}>
                   Hover over any component in the diagram to learn what it does and how it connects to the rest of the system.
                 </p>
                 <Link
                   to="/architecture"
-                  className="font-display"
-                  style={{ fontSize: '0.9rem', fontWeight: 600, color: '#EE0000', textDecoration: 'none' }}
+                  style={{
+                    display: 'inline-block',
+                    padding: '14px 24px',
+                    backgroundColor: '#EE0000',
+                    color: '#fff',
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 700,
+                    fontSize: '16px',
+                    textTransform: 'uppercase',
+                    borderRadius: '0',
+                    textDecoration: 'none',
+                    transition: 'background 0.5s ease',
+                    letterSpacing: '0.03em',
+                  }}
+                  onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#A30000')}
+                  onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
                 >
-                  Open full Architecture Explorer &rarr;
+                  Open Architecture Explorer
                 </Link>
               </div>
             )}
@@ -136,8 +167,17 @@ export default function ArchitecturePreview() {
       </div>
 
       <style>{`
-        @media (max-width: 768px) {
-          .arch-grid { grid-template-columns: 1fr !important; }
+        @media (max-width: 900px) {
+          .arch-layout {
+            flex-direction: column !important;
+          }
+          .arch-diagram {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+          }
+          .arch-content {
+            flex: 0 0 100% !important;
+          }
         }
       `}</style>
     </section>

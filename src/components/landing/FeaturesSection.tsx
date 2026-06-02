@@ -22,13 +22,13 @@ const items = [
   {
     icon: Settings2,
     title: 'Deployment Configurator',
-    desc: 'Walk through your model, hardware, and workload choices to generate a complete, ready-to-apply deployment config.',
+    desc: 'Walk through your model, hardware, and workload choices to generate a complete deployment config.',
     path: '/configurator',
   },
   {
     icon: Network,
     title: 'Routing Visualizer',
-    desc: 'See animated requests flowing across replicas and learn why one routing strategy beats another for your workload.',
+    desc: 'See animated requests flowing across replicas and learn why one routing strategy beats another.',
     path: '/routing',
   },
   {
@@ -68,31 +68,38 @@ export default function FeaturesSection() {
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section style={{ backgroundColor: '#fff', padding: '100px 0' }}>
-      <div style={{ maxWidth: '1060px', margin: '0 auto', padding: '0 40px' }}>
+    <section style={{ backgroundColor: '#fff', padding: '80px 0 100px' }}>
+      <div style={{ maxWidth: '1244px', margin: '0 auto', padding: '0 30px' }}>
         <motion.div
           ref={ref}
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4 }}
-          style={{ textAlign: 'center', marginBottom: '80px' }}
+          style={{ textAlign: 'center', marginBottom: '20px' }}
         >
           <h2
-            className="font-display"
-            style={{ fontSize: '2rem', fontWeight: 700, color: '#151515', marginBottom: '16px' }}
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: '44px',
+              lineHeight: '110%',
+              fontWeight: 600,
+              color: '#151515',
+              marginBottom: '10px',
+            }}
           >
             Guides &amp; Tools
           </h2>
-          <p style={{ fontSize: '1.05rem', color: '#4D4D4D', lineHeight: 1.7, maxWidth: '540px', margin: '0 auto' }}>
+          <p style={{ fontSize: '18px', color: '#4D4D4D', lineHeight: '28px', maxWidth: '540px', margin: '0 auto' }}>
             Everything you need to understand, configure, and operate llm-d.
           </p>
         </motion.div>
 
+        {/* 3-column card grid, UPenn style */}
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-            gap: '32px',
+            display: 'flex',
+            flexWrap: 'wrap',
+            margin: '0 -15px',
           }}
         >
           {items.map((item, i) => (
@@ -101,43 +108,65 @@ export default function FeaturesSection() {
               initial={{ opacity: 0, y: 16 }}
               animate={isInView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.35, delay: i * 0.05 }}
+              style={{
+                flex: '0 0 33.33%',
+                maxWidth: '33.33%',
+                padding: '15px',
+              }}
+              className="features-card-col"
             >
               <Link
                 to={item.path}
                 style={{
                   display: 'block',
-                  padding: '40px 36px',
-                  backgroundColor: '#f7f7f7',
-                  borderRadius: '12px',
+                  padding: '40px',
+                  backgroundColor: '#151515',
+                  color: '#fff',
+                  textAlign: 'center',
                   textDecoration: 'none',
                   height: '100%',
-                  transition: 'box-shadow 0.25s, background-color 0.25s',
+                  position: 'relative',
+                  top: '0',
+                  transition: 'ease 0.5s all',
                 }}
                 onMouseEnter={e => {
-                  e.currentTarget.style.boxShadow = '0 4px 20px rgba(0,0,0,0.08)'
-                  e.currentTarget.style.backgroundColor = '#fff'
+                  e.currentTarget.style.top = '8px'
+                  e.currentTarget.style.backgroundColor = '#1F1F1F'
                 }}
                 onMouseLeave={e => {
-                  e.currentTarget.style.boxShadow = 'none'
-                  e.currentTarget.style.backgroundColor = '#f7f7f7'
+                  e.currentTarget.style.top = '0'
+                  e.currentTarget.style.backgroundColor = '#151515'
                 }}
               >
                 <item.icon
-                  style={{ width: '28px', height: '28px', color: '#EE0000', marginBottom: '28px' }}
-                />
-                <h3
-                  className="font-display"
                   style={{
-                    fontSize: '1.15rem',
+                    width: '36px',
+                    height: '36px',
+                    color: '#EE0000',
+                    marginBottom: '24px',
+                    display: 'inline-block',
+                  }}
+                />
+                <h4
+                  style={{
+                    fontFamily: 'var(--font-display)',
                     fontWeight: 700,
-                    color: '#151515',
+                    fontSize: '28px',
+                    lineHeight: '1.2',
                     marginBottom: '14px',
-                    lineHeight: 1.3,
+                    color: '#fff',
                   }}
                 >
                   {item.title}
-                </h3>
-                <p style={{ fontSize: '0.92rem', color: '#4D4D4D', lineHeight: 1.75, margin: 0 }}>
+                </h4>
+                <p
+                  style={{
+                    fontSize: '16px',
+                    lineHeight: '24px',
+                    color: 'rgba(255,255,255,0.7)',
+                    margin: 0,
+                  }}
+                >
                   {item.desc}
                 </p>
               </Link>
@@ -145,6 +174,22 @@ export default function FeaturesSection() {
           ))}
         </div>
       </div>
+
+      {/* Responsive: cards go to 2-col on tablet, 1-col on mobile */}
+      <style>{`
+        @media (max-width: 1024px) {
+          .features-card-col {
+            flex: 0 0 50% !important;
+            max-width: 50% !important;
+          }
+        }
+        @media (max-width: 640px) {
+          .features-card-col {
+            flex: 0 0 100% !important;
+            max-width: 100% !important;
+          }
+        }
+      `}</style>
     </section>
   )
 }

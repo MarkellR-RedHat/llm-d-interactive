@@ -22,14 +22,14 @@ export default function HeroSection() {
     window.addEventListener('resize', resize)
 
     const nodes: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = []
-    for (let i = 0; i < 45; i++) {
+    for (let i = 0; i < 60; i++) {
       nodes.push({
         x: Math.random() * canvas.offsetWidth,
         y: Math.random() * canvas.offsetHeight,
-        vx: (Math.random() - 0.5) * 0.2,
-        vy: (Math.random() - 0.5) * 0.2,
-        r: Math.random() * 2 + 1,
-        o: Math.random() * 0.12 + 0.04,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: (Math.random() - 0.5) * 0.3,
+        r: Math.random() * 2.5 + 1,
+        o: Math.random() * 0.25 + 0.08,
       })
     }
 
@@ -60,7 +60,7 @@ export default function HeroSection() {
         n.vy *= 0.998
         ctx.beginPath()
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(180, 180, 185, ${n.o})`
+        ctx.fillStyle = `rgba(200, 200, 205, ${n.o})`
         ctx.fill()
         for (let j = i + 1; j < nodes.length; j++) {
           const m = nodes[j]
@@ -69,7 +69,7 @@ export default function HeroSection() {
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
-            ctx.strokeStyle = `rgba(180, 180, 185, ${(1 - cd / 180) * 0.05})`
+            ctx.strokeStyle = `rgba(200, 200, 205, ${(1 - cd / 180) * 0.08})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }
@@ -87,64 +87,111 @@ export default function HeroSection() {
   }, [])
 
   return (
-    <section className="relative bg-[#f7f7f7] overflow-hidden" style={{ paddingTop: '160px', paddingBottom: '120px' }}>
-      <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
+    <section
+      style={{
+        position: 'relative',
+        backgroundColor: '#151515',
+        overflow: 'hidden',
+        /* Padding accounts for ~100px header + 100px internal padding per UPenn */
+        paddingTop: '200px',
+        paddingBottom: '100px',
+      }}
+    >
+      {/* Particle canvas - absolute behind everything, like particles-js */}
+      <canvas
+        ref={canvasRef}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          zIndex: 10,
+        }}
+      />
 
-      <div className="relative z-10" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 40px', textAlign: 'center' }}>
+      {/* Dark overlay on top of particles */}
+      <div
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(21,21,21,0.75)',
+          zIndex: 11,
+        }}
+      />
+
+      {/* Content on top */}
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 12,
+          maxWidth: '1244px',
+          margin: '0 auto',
+          padding: '0 30px',
+        }}
+      >
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="font-display"
           style={{
-            fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)',
-            fontWeight: 800,
-            color: '#151515',
-            lineHeight: 1.2,
+            fontFamily: 'var(--font-display)',
+            fontSize: 'clamp(40px, 7vw, 80px)',
+            fontWeight: 300,
+            lineHeight: '110%',
             letterSpacing: '-0.02em',
-            marginBottom: '28px',
+            color: '#ffffff',
+            paddingBottom: '32px',
+            maxWidth: '900px',
           }}
         >
           Learn how to serve large language models with llm-d
         </motion.h1>
 
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.35 }}
           style={{
-            fontSize: '1.15rem',
-            color: '#4D4D4D',
-            lineHeight: 1.8,
-            maxWidth: '620px',
-            margin: '0 auto 48px',
+            fontSize: '20px',
+            lineHeight: '32px',
+            color: 'rgba(255,255,255,0.75)',
+            maxWidth: '600px',
+            marginBottom: '48px',
           }}
         >
           Interactive guides, tools, and hands-on notebooks for the open source
           Kubernetes-native LLM serving platform.
         </motion.p>
 
+        {/* CTA buttons - UPenn style: uppercase, no border-radius, bold */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}
+          className="ctas"
+          style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}
         >
           <Link
             to="/learn"
             style={{
               display: 'inline-block',
-              padding: '14px 36px',
+              padding: '14px 24px',
               backgroundColor: '#EE0000',
               color: '#fff',
               fontFamily: 'var(--font-display)',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              borderRadius: '6px',
+              fontWeight: 700,
+              fontSize: '16px',
+              textTransform: 'uppercase',
+              borderRadius: '0',
               textDecoration: 'none',
-              transition: 'background-color 0.2s',
+              transition: 'background 0.5s ease',
+              letterSpacing: '0.03em',
             }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#CC0000')}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#A30000')}
             onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
           >
             Start Learning
@@ -153,19 +200,27 @@ export default function HeroSection() {
             to="/configurator"
             style={{
               display: 'inline-block',
-              padding: '14px 36px',
+              padding: '14px 24px',
               backgroundColor: 'transparent',
-              color: '#151515',
+              color: '#fff',
               fontFamily: 'var(--font-display)',
-              fontWeight: 600,
-              fontSize: '0.95rem',
-              borderRadius: '6px',
+              fontWeight: 700,
+              fontSize: '16px',
+              textTransform: 'uppercase',
+              borderRadius: '0',
               textDecoration: 'none',
-              border: '1.5px solid #D2D2D2',
-              transition: 'border-color 0.2s',
+              border: '2px solid rgba(255,255,255,0.4)',
+              transition: 'background 0.5s ease, border-color 0.5s ease',
+              letterSpacing: '0.03em',
             }}
-            onMouseEnter={e => (e.currentTarget.style.borderColor = '#8A8D90')}
-            onMouseLeave={e => (e.currentTarget.style.borderColor = '#D2D2D2')}
+            onMouseEnter={e => {
+              e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.7)'
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.backgroundColor = 'transparent'
+              e.currentTarget.style.borderColor = 'rgba(255,255,255,0.4)'
+            }}
           >
             Explore Tools
           </Link>

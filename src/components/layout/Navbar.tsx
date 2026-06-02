@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Menu, X, ChevronDown, ExternalLink } from 'lucide-react'
 
 const navItems = [
+  { label: 'Home', path: '/' },
   { label: 'Learn', path: '/learn' },
   {
     label: 'Tools',
@@ -27,102 +28,262 @@ const navItems = [
 export default function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [scrolled, setScrolled] = useState(false)
   const location = useLocation()
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10)
+    }
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [])
 
   const isActive = (path: string) => location.pathname === path
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-rh-white/90 backdrop-blur-xl border-b border-rh-gray-100">
-      <div className="max-w-5xl mx-auto px-8 lg:px-12">
-        <div className="flex items-center justify-between h-[72px]">
-          <Link to="/" className="flex items-center gap-3 no-underline">
-            <div className="w-9 h-9 bg-rh-red rounded-lg flex items-center justify-center">
-              <span className="text-white font-display font-extrabold text-base">d</span>
-            </div>
-            <div className="flex items-baseline gap-1.5">
-              <span className="font-display font-bold text-xl text-rh-black tracking-tight">llm-d</span>
-              <span className="font-display font-medium text-sm text-rh-gray-500 hidden sm:inline">Learning Center</span>
-            </div>
-          </Link>
-
-          <div className="hidden lg:flex items-center gap-2">
-            {navItems.map((item) => (
-              'children' in item && item.children ? (
-                <div
-                  key={item.label}
-                  className="relative"
-                  onMouseEnter={() => setOpenDropdown(item.label)}
-                  onMouseLeave={() => setOpenDropdown(null)}
-                >
-                  <button className="flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium text-rh-gray-700 hover:text-rh-red transition-colors rounded-lg hover:bg-rh-red-50">
-                    {item.label}
-                    <ChevronDown className="w-3.5 h-3.5" />
-                  </button>
-                  <AnimatePresence>
-                    {openDropdown === item.label && (
-                      <motion.div
-                        initial={{ opacity: 0, y: 8, scale: 0.96 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 8, scale: 0.96 }}
-                        transition={{ duration: 0.15, ease: 'easeOut' }}
-                        className="absolute top-full left-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-rh-gray-100 overflow-hidden"
-                      >
-                        <div className="p-3">
-                          {item.children.map((child) => (
-                            <Link
-                              key={child.path}
-                              to={child.path}
-                              className={`block px-5 py-4 rounded-lg transition-all no-underline ${
-                                isActive(child.path)
-                                  ? 'bg-rh-red-50 text-rh-red'
-                                  : 'text-rh-gray-700 hover:bg-rh-gray-50'
-                              }`}
-                            >
-                              <div className="font-medium text-sm">{child.label}</div>
-                              <div className="text-xs text-rh-gray-500 mt-1 leading-relaxed">{child.desc}</div>
-                            </Link>
-                          ))}
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
-              ) : (
-                <Link
-                  key={item.label}
-                  to={item.path!}
-                  className={`px-4 py-2.5 text-sm font-medium rounded-lg transition-colors no-underline ${
-                    isActive(item.path!)
-                      ? 'text-rh-red bg-rh-red-50'
-                      : 'text-rh-gray-700 hover:text-rh-red hover:bg-rh-red-50'
-                  }`}
-                >
-                  {item.label}
-                </Link>
-              )
-            ))}
-          </div>
-
-          <div className="hidden lg:flex items-center">
-            <a
-              href="https://github.com/llm-d/llm-d"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2.5 text-sm font-medium text-rh-gray-600 hover:text-rh-black transition-colors no-underline"
-            >
-              GitHub
-            </a>
-          </div>
-
-          <button
-            className="lg:hidden p-2.5 text-rh-gray-700 hover:text-rh-red transition-colors"
-            onClick={() => setMobileOpen(!mobileOpen)}
+    <header
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        width: '100%',
+        zIndex: 1000,
+        backgroundColor: '#fff',
+        transition: 'ease 0.4s all',
+        boxShadow: scrolled ? '0 2px 10px rgba(0,0,0,0.08)' : 'none',
+      }}
+    >
+      {/* Top bar: logo + subtitle */}
+      <div
+        style={{
+          maxWidth: '1244px',
+          margin: '0 auto',
+          padding: scrolled ? '8px 30px' : '16px 30px',
+          transition: 'ease 0.4s all',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+        }}
+      >
+        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '12px', textDecoration: 'none' }}>
+          <div
+            style={{
+              width: '40px',
+              height: '40px',
+              backgroundColor: '#EE0000',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
           >
-            {mobileOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            <span
+              style={{
+                color: '#fff',
+                fontFamily: 'var(--font-display)',
+                fontWeight: 800,
+                fontSize: '18px',
+              }}
+            >
+              d
+            </span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'baseline', gap: '10px' }}>
+            <span
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: '22px',
+                color: '#151515',
+                letterSpacing: '-0.01em',
+              }}
+            >
+              llm-d
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 400,
+                fontSize: '16px',
+                color: '#6A6E73',
+                fontStyle: 'italic',
+              }}
+            >
+              Learning Center
+            </span>
+          </div>
+        </Link>
+
+        {/* GitHub link (top right, desktop) */}
+        <div className="hidden lg:flex" style={{ alignItems: 'center' }}>
+          <a
+            href="https://github.com/llm-d/llm-d"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '6px',
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#3C3F42',
+              textDecoration: 'none',
+            }}
+          >
+            GitHub
+            <ExternalLink style={{ width: '13px', height: '13px' }} />
+          </a>
         </div>
+
+        {/* Mobile hamburger */}
+        <button
+          className="lg:hidden"
+          onClick={() => setMobileOpen(!mobileOpen)}
+          style={{
+            background: 'none',
+            border: 'none',
+            cursor: 'pointer',
+            padding: '8px',
+            color: '#3C3F42',
+          }}
+        >
+          {mobileOpen ? <X style={{ width: '24px', height: '24px' }} /> : <Menu style={{ width: '24px', height: '24px' }} />}
+        </button>
       </div>
 
+      {/* Nav bar below logo (desktop) */}
+      <div
+        className="hidden lg:block"
+        style={{
+          borderTop: '1px solid #E0E0E0',
+          backgroundColor: '#fff',
+        }}
+      >
+        <nav
+          style={{
+            maxWidth: '1244px',
+            margin: '0 auto',
+            padding: '0 30px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0',
+          }}
+        >
+          {navItems.map((item) =>
+            'children' in item && item.children ? (
+              <div
+                key={item.label}
+                style={{ position: 'relative' }}
+                onMouseEnter={() => setOpenDropdown(item.label)}
+                onMouseLeave={() => setOpenDropdown(null)}
+              >
+                <button
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '5px',
+                    padding: '14px 20px',
+                    fontSize: '15px',
+                    fontWeight: 600,
+                    fontFamily: 'var(--font-body)',
+                    color: openDropdown === item.label ? '#EE0000' : '#3C3F42',
+                    background: 'none',
+                    border: 'none',
+                    cursor: 'pointer',
+                    transition: 'color 0.3s ease',
+                    borderBottom: '3px solid transparent',
+                  }}
+                >
+                  {item.label}
+                  <ChevronDown style={{ width: '14px', height: '14px' }} />
+                </button>
+                <AnimatePresence>
+                  {openDropdown === item.label && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 4 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: 4 }}
+                      transition={{ duration: 0.15, ease: 'easeOut' }}
+                      style={{
+                        position: 'absolute',
+                        top: '100%',
+                        left: 0,
+                        minWidth: '300px',
+                        backgroundColor: '#fff',
+                        boxShadow: '0 8px 30px rgba(0,0,0,0.12)',
+                        border: '1px solid #E0E0E0',
+                        zIndex: 1001,
+                      }}
+                    >
+                      {item.children.map((child) => (
+                        <Link
+                          key={child.path}
+                          to={child.path}
+                          style={{
+                            display: 'block',
+                            padding: '14px 20px',
+                            textDecoration: 'none',
+                            borderBottom: '1px solid #F0F0F0',
+                            backgroundColor: isActive(child.path) ? '#FFF0F0' : 'transparent',
+                            transition: 'background-color 0.2s ease',
+                          }}
+                          onMouseEnter={(e) => {
+                            if (!isActive(child.path)) e.currentTarget.style.backgroundColor = '#f7f7f7'
+                          }}
+                          onMouseLeave={(e) => {
+                            if (!isActive(child.path)) e.currentTarget.style.backgroundColor = 'transparent'
+                          }}
+                        >
+                          <div
+                            style={{
+                              fontSize: '14px',
+                              fontWeight: 600,
+                              color: isActive(child.path) ? '#EE0000' : '#151515',
+                              marginBottom: '3px',
+                            }}
+                          >
+                            {child.label}
+                          </div>
+                          <div
+                            style={{
+                              fontSize: '13px',
+                              color: '#6A6E73',
+                              lineHeight: '1.4',
+                            }}
+                          >
+                            {child.desc}
+                          </div>
+                        </Link>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            ) : (
+              <Link
+                key={item.label}
+                to={item.path!}
+                style={{
+                  display: 'block',
+                  padding: '14px 20px',
+                  fontSize: '15px',
+                  fontWeight: 600,
+                  fontFamily: 'var(--font-body)',
+                  color: isActive(item.path!) ? '#EE0000' : '#3C3F42',
+                  textDecoration: 'none',
+                  borderBottom: isActive(item.path!) ? '3px solid #EE0000' : '3px solid transparent',
+                  transition: 'color 0.3s ease',
+                }}
+              >
+                {item.label}
+              </Link>
+            )
+          )}
+        </nav>
+      </div>
+
+      {/* Mobile menu */}
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -130,13 +291,27 @@ export default function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.2 }}
-            className="lg:hidden border-t border-rh-gray-100 bg-white overflow-hidden"
+            className="lg:hidden"
+            style={{
+              borderTop: '1px solid #E0E0E0',
+              backgroundColor: '#fff',
+              overflow: 'hidden',
+            }}
           >
-            <div className="px-8 py-6 space-y-2">
-              {navItems.map((item) => (
+            <div style={{ padding: '16px 30px' }}>
+              {navItems.map((item) =>
                 'children' in item && item.children ? (
-                  <div key={item.label} className="mb-4">
-                    <div className="px-4 py-2 text-xs font-semibold uppercase tracking-wider text-rh-gray-400">
+                  <div key={item.label} style={{ marginBottom: '16px' }}>
+                    <div
+                      style={{
+                        padding: '8px 0',
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.08em',
+                        color: '#8A8D90',
+                      }}
+                    >
                       {item.label}
                     </div>
                     {item.children.map((child) => (
@@ -144,11 +319,16 @@ export default function Navbar() {
                         key={child.path}
                         to={child.path}
                         onClick={() => setMobileOpen(false)}
-                        className={`block px-4 py-3 rounded-lg text-sm no-underline ${
-                          isActive(child.path)
-                            ? 'bg-rh-red-50 text-rh-red font-medium'
-                            : 'text-rh-gray-700'
-                        }`}
+                        style={{
+                          display: 'block',
+                          padding: '10px 12px',
+                          fontSize: '15px',
+                          fontWeight: isActive(child.path) ? 600 : 400,
+                          color: isActive(child.path) ? '#EE0000' : '#3C3F42',
+                          textDecoration: 'none',
+                          backgroundColor: isActive(child.path) ? '#FFF0F0' : 'transparent',
+                          borderRadius: '4px',
+                        }}
                       >
                         {child.label}
                       </Link>
@@ -159,20 +339,43 @@ export default function Navbar() {
                     key={item.label}
                     to={item.path!}
                     onClick={() => setMobileOpen(false)}
-                    className={`block px-4 py-3 rounded-lg text-sm no-underline ${
-                      isActive(item.path!)
-                        ? 'bg-rh-red-50 text-rh-red font-medium'
-                        : 'text-rh-gray-700'
-                    }`}
+                    style={{
+                      display: 'block',
+                      padding: '10px 12px',
+                      fontSize: '15px',
+                      fontWeight: isActive(item.path!) ? 600 : 400,
+                      color: isActive(item.path!) ? '#EE0000' : '#3C3F42',
+                      textDecoration: 'none',
+                      backgroundColor: isActive(item.path!) ? '#FFF0F0' : 'transparent',
+                      borderRadius: '4px',
+                    }}
                   >
                     {item.label}
                   </Link>
                 )
-              ))}
+              )}
+              <a
+                href="https://github.com/llm-d/llm-d"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 12px',
+                  fontSize: '15px',
+                  fontWeight: 400,
+                  color: '#3C3F42',
+                  textDecoration: 'none',
+                }}
+              >
+                GitHub
+                <ExternalLink style={{ width: '13px', height: '13px' }} />
+              </a>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
-    </nav>
+    </header>
   )
 }
