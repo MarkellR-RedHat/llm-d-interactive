@@ -1,7 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-router-dom'
-import { BookOpen, Compass, FlaskConical } from 'lucide-react'
 
 export default function HeroSection() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -19,19 +18,18 @@ export default function HeroSection() {
       canvas.height = canvas.offsetHeight * window.devicePixelRatio
       ctx.scale(window.devicePixelRatio, window.devicePixelRatio)
     }
-
     resize()
     window.addEventListener('resize', resize)
 
     const nodes: { x: number; y: number; vx: number; vy: number; r: number; o: number }[] = []
-    for (let i = 0; i < 50; i++) {
+    for (let i = 0; i < 45; i++) {
       nodes.push({
         x: Math.random() * canvas.offsetWidth,
         y: Math.random() * canvas.offsetHeight,
-        vx: (Math.random() - 0.5) * 0.25,
-        vy: (Math.random() - 0.5) * 0.25,
-        r: Math.random() * 1.8 + 0.8,
-        o: Math.random() * 0.15 + 0.05,
+        vx: (Math.random() - 0.5) * 0.2,
+        vy: (Math.random() - 0.5) * 0.2,
+        r: Math.random() * 2 + 1,
+        o: Math.random() * 0.12 + 0.04,
       })
     }
 
@@ -45,37 +43,33 @@ export default function HeroSection() {
       const w = canvas.offsetWidth
       const h = canvas.offsetHeight
       ctx.clearRect(0, 0, w, h)
-
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i]
         n.x += n.vx
         n.y += n.vy
         if (n.x < 0 || n.x > w) n.vx *= -1
         if (n.y < 0 || n.y > h) n.vy *= -1
-
         const dx = mouseRef.current.x - n.x
         const dy = mouseRef.current.y - n.y
         const dist = Math.sqrt(dx * dx + dy * dy)
         if (dist < 200) {
-          n.vx += dx * (200 - dist) / 200 * 0.0002
-          n.vy += dy * (200 - dist) / 200 * 0.0002
+          n.vx += dx * (200 - dist) / 200 * 0.00015
+          n.vy += dy * (200 - dist) / 200 * 0.00015
         }
-        n.vx *= 0.997
-        n.vy *= 0.997
-
+        n.vx *= 0.998
+        n.vy *= 0.998
         ctx.beginPath()
         ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2)
-        ctx.fillStyle = `rgba(200, 200, 200, ${n.o})`
+        ctx.fillStyle = `rgba(180, 180, 185, ${n.o})`
         ctx.fill()
-
         for (let j = i + 1; j < nodes.length; j++) {
           const m = nodes[j]
           const cd = Math.sqrt((n.x - m.x) ** 2 + (n.y - m.y) ** 2)
-          if (cd < 160) {
+          if (cd < 180) {
             ctx.beginPath()
             ctx.moveTo(n.x, n.y)
             ctx.lineTo(m.x, m.y)
-            ctx.strokeStyle = `rgba(180, 180, 180, ${(1 - cd / 160) * 0.06})`
+            ctx.strokeStyle = `rgba(180, 180, 185, ${(1 - cd / 180) * 0.05})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }
@@ -92,103 +86,89 @@ export default function HeroSection() {
     }
   }, [])
 
-  const pathways = [
-    {
-      icon: BookOpen,
-      title: 'Learn the fundamentals',
-      desc: 'Understand what llm-d is, how disaggregated inference works, and why it matters for serving LLMs at scale.',
-      path: '/learn',
-      label: 'Start learning',
-    },
-    {
-      icon: Compass,
-      title: 'Explore the tools',
-      desc: 'Try the deployment configurator, visualize routing strategies, and plan your cluster capacity interactively.',
-      path: '/configurator',
-      label: 'Explore tools',
-    },
-    {
-      icon: FlaskConical,
-      title: 'Hands-on tutorials',
-      desc: 'Work through Jupyter notebooks that walk you through real llm-d deployments step by step.',
-      path: '/notebooks',
-      label: 'Open notebooks',
-    },
-  ]
-
   return (
-    <section className="relative overflow-hidden bg-rh-gray-50">
+    <section className="relative bg-[#f7f7f7] overflow-hidden" style={{ paddingTop: '160px', paddingBottom: '120px' }}>
       <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />
 
-      <div className="relative z-10 max-w-5xl mx-auto px-8 lg:px-12 pt-48 pb-32">
-        <div className="max-w-2xl mb-10">
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="text-rh-red text-sm font-semibold tracking-wide uppercase mb-5"
-          >
-            Open source LLM serving platform
-          </motion.p>
-
-          <motion.h1
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.25 }}
-            className="font-display font-extrabold text-4xl sm:text-5xl lg:text-[3.5rem] text-rh-black leading-[1.15] tracking-tight"
-          >
-            llm-d Learning Center
-          </motion.h1>
-        </div>
+      <div className="relative z-10" style={{ maxWidth: '900px', margin: '0 auto', padding: '0 40px', textAlign: 'center' }}>
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="font-display"
+          style={{
+            fontSize: 'clamp(2.2rem, 4.5vw, 3.4rem)',
+            fontWeight: 800,
+            color: '#151515',
+            lineHeight: 1.2,
+            letterSpacing: '-0.02em',
+            marginBottom: '28px',
+          }}
+        >
+          Learn how to serve large language models with llm-d
+        </motion.h1>
 
         <motion.p
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.35 }}
-          className="text-lg text-rh-gray-600 max-w-2xl leading-[1.8] mb-24"
+          transition={{ duration: 0.6, delay: 0.35 }}
+          style={{
+            fontSize: '1.15rem',
+            color: '#4D4D4D',
+            lineHeight: 1.8,
+            maxWidth: '620px',
+            margin: '0 auto 48px',
+          }}
         >
-          Explore how disaggregated inference, intelligent routing, and autoscaling
-          work together on Kubernetes. Learn at your own pace with guides, interactive
-          tools, and hands-on notebooks.
+          Interactive guides, tools, and hands-on notebooks for the open source
+          Kubernetes-native LLM serving platform.
         </motion.p>
 
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.45 }}
-          className="grid grid-cols-1 md:grid-cols-3 gap-10"
+          transition={{ duration: 0.6, delay: 0.5 }}
+          style={{ display: 'flex', gap: '16px', justifyContent: 'center', flexWrap: 'wrap' }}
         >
-          {pathways.map((p, i) => (
-            <motion.div
-              key={p.title}
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, delay: 0.5 + i * 0.1 }}
-            >
-              <Link
-                to={p.path}
-                className="group block bg-white rounded-2xl border border-rh-gray-100 hover:border-rh-gray-200 hover:shadow-lg transition-all duration-300 no-underline h-full"
-              >
-                <div className="p-10">
-                  <div className="w-14 h-14 rounded-xl bg-rh-red-50 flex items-center justify-center mb-8">
-                    <p.icon className="w-6 h-6 text-rh-red" />
-                  </div>
-
-                  <h3 className="font-display font-bold text-xl text-rh-black mb-4 leading-snug">
-                    {p.title}
-                  </h3>
-
-                  <p className="text-[15px] text-rh-gray-600 leading-[1.75] mb-8">
-                    {p.desc}
-                  </p>
-
-                  <span className="text-sm font-semibold text-rh-red group-hover:text-rh-red-dark transition-colors">
-                    {p.label} &rarr;
-                  </span>
-                </div>
-              </Link>
-            </motion.div>
-          ))}
+          <Link
+            to="/learn"
+            style={{
+              display: 'inline-block',
+              padding: '14px 36px',
+              backgroundColor: '#EE0000',
+              color: '#fff',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              transition: 'background-color 0.2s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#CC0000')}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#EE0000')}
+          >
+            Start Learning
+          </Link>
+          <Link
+            to="/configurator"
+            style={{
+              display: 'inline-block',
+              padding: '14px 36px',
+              backgroundColor: 'transparent',
+              color: '#151515',
+              fontFamily: 'var(--font-display)',
+              fontWeight: 600,
+              fontSize: '0.95rem',
+              borderRadius: '6px',
+              textDecoration: 'none',
+              border: '1.5px solid #D2D2D2',
+              transition: 'border-color 0.2s',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.borderColor = '#8A8D90')}
+            onMouseLeave={e => (e.currentTarget.style.borderColor = '#D2D2D2')}
+          >
+            Explore Tools
+          </Link>
         </motion.div>
       </div>
     </section>

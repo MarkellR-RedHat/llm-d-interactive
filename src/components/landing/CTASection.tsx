@@ -1,37 +1,12 @@
 import { motion, useInView } from 'framer-motion'
 import { useRef } from 'react'
 import { Link } from 'react-router-dom'
-import { BookOpen, GitBranch, FileText, MessageCircle } from 'lucide-react'
 
-const resources = [
-  {
-    icon: BookOpen,
-    title: 'Learning Center',
-    desc: 'Start from the beginning. Understand what llm-d is, why it exists, and how each piece fits together.',
-    path: '/learn',
-    internal: true,
-  },
-  {
-    icon: FileText,
-    title: 'Documentation',
-    desc: 'Full reference documentation for installation, configuration, API, and operations.',
-    path: 'https://llm-d.github.io/llm-d-docs/',
-    internal: false,
-  },
-  {
-    icon: GitBranch,
-    title: 'Source Code',
-    desc: 'Browse the codebase, open issues, or contribute. llm-d is Apache 2.0 licensed.',
-    path: 'https://github.com/llm-d/llm-d',
-    internal: false,
-  },
-  {
-    icon: MessageCircle,
-    title: 'Community',
-    desc: 'Ask questions, share what you have built, and connect with other llm-d users and contributors.',
-    path: 'https://github.com/llm-d/llm-d/discussions',
-    internal: false,
-  },
+const links = [
+  { title: 'Learning Center', desc: 'Start from the beginning with guides for every level.', path: '/learn', internal: true },
+  { title: 'Documentation', desc: 'Full reference for installation, configuration, and API.', path: 'https://llm-d.github.io/llm-d-docs/', internal: false },
+  { title: 'Source Code', desc: 'Browse the codebase or contribute. Apache 2.0 licensed.', path: 'https://github.com/llm-d/llm-d', internal: false },
+  { title: 'Community', desc: 'Ask questions and connect with other llm-d users.', path: 'https://github.com/llm-d/llm-d/discussions', internal: false },
 ]
 
 export default function CTASection() {
@@ -39,61 +14,70 @@ export default function CTASection() {
   const isInView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section className="py-32 lg:py-40 bg-white border-t border-rh-gray-100">
-      <div className="max-w-5xl mx-auto px-8 lg:px-12">
+    <section style={{ backgroundColor: '#fff', padding: '100px 0', borderTop: '1px solid #E0E0E0' }}>
+      <div ref={ref} style={{ maxWidth: '1060px', margin: '0 auto', padding: '0 40px' }}>
         <motion.div
-          ref={ref}
           initial={{ opacity: 0, y: 16 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.4 }}
-          className="mb-20"
+          style={{ marginBottom: '64px' }}
         >
-          <p className="text-rh-red text-sm font-semibold tracking-wide uppercase mb-5">
+          <h2 className="font-display" style={{ fontSize: '2rem', fontWeight: 700, color: '#151515', marginBottom: '16px' }}>
             Resources
-          </p>
-          <h2 className="font-display font-extrabold text-3xl sm:text-4xl text-rh-black mb-8 leading-tight">
-            Keep going
           </h2>
-          <p className="text-rh-gray-600 text-lg max-w-xl leading-[1.8]">
-            Whether you are just getting started or looking for something specific,
-            these resources will help you find what you need.
+          <p style={{ fontSize: '1.05rem', color: '#4D4D4D', lineHeight: 1.7, maxWidth: '480px' }}>
+            Whether you are just starting out or looking for something specific.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10">
-          {resources.map((r, i) => {
-            const inner = (
-              <div className="p-10 lg:p-12">
-                <div className="w-12 h-12 rounded-xl bg-rh-gray-100 flex items-center justify-center mb-8 group-hover:bg-rh-red-50 transition-colors">
-                  <r.icon className="w-5 h-5 text-rh-gray-500 group-hover:text-rh-red transition-colors" />
-                </div>
-                <h3 className="font-display font-bold text-lg text-rh-black mb-4">{r.title}</h3>
-                <p className="text-sm text-rh-gray-600 leading-[1.75]">{r.desc}</p>
-              </div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))', gap: '24px' }}>
+          {links.map((item, i) => {
+            const style: React.CSSProperties = {
+              display: 'block',
+              padding: '32px 28px',
+              borderRadius: '10px',
+              border: '1px solid #E0E0E0',
+              textDecoration: 'none',
+              transition: 'border-color 0.2s, box-shadow 0.2s',
+              height: '100%',
+            }
+            const content = (
+              <>
+                <h3 className="font-display" style={{ fontSize: '1.05rem', fontWeight: 700, color: '#151515', marginBottom: '10px' }}>
+                  {item.title}
+                </h3>
+                <p style={{ fontSize: '0.88rem', color: '#6A6E73', lineHeight: 1.7, margin: 0 }}>
+                  {item.desc}
+                </p>
+              </>
             )
 
             return (
               <motion.div
-                key={r.title}
-                initial={{ opacity: 0, y: 16 }}
+                key={item.title}
+                initial={{ opacity: 0, y: 12 }}
                 animate={isInView ? { opacity: 1, y: 0 } : {}}
-                transition={{ duration: 0.4, delay: 0.1 + i * 0.06 }}
+                transition={{ duration: 0.3, delay: i * 0.05 }}
               >
-                {r.internal ? (
+                {item.internal ? (
                   <Link
-                    to={r.path}
-                    className="group block rounded-2xl bg-rh-gray-50 border border-rh-gray-100 hover:border-rh-gray-200 hover:shadow-lg hover:bg-white transition-all duration-300 no-underline h-full"
+                    to={item.path}
+                    style={style}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#B8BBBE'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#E0E0E0'; e.currentTarget.style.boxShadow = 'none' }}
                   >
-                    {inner}
+                    {content}
                   </Link>
                 ) : (
                   <a
-                    href={r.path}
+                    href={item.path}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="group block rounded-2xl bg-rh-gray-50 border border-rh-gray-100 hover:border-rh-gray-200 hover:shadow-lg hover:bg-white transition-all duration-300 no-underline h-full"
+                    style={style}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = '#B8BBBE'; e.currentTarget.style.boxShadow = '0 2px 12px rgba(0,0,0,0.06)' }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = '#E0E0E0'; e.currentTarget.style.boxShadow = 'none' }}
                   >
-                    {inner}
+                    {content}
                   </a>
                 )}
               </motion.div>
