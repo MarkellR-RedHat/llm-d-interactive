@@ -1,6 +1,6 @@
 # llm-d Interactive Platform
 
-The official interactive companion for [llm-d](https://github.com/llm-d/llm-d), the open source Kubernetes-native platform for serving large language models at scale.
+An interactive companion for [llm-d](https://github.com/llm-d/llm-d), the open source Kubernetes-native platform for serving large language models at scale.
 
 ## What's Here
 
