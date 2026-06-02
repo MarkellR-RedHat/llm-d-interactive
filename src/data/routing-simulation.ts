@@ -380,6 +380,10 @@ export function simulateTick(
       req,
     )
 
+    // Propagate the routed target back onto the original request object
+    // so the UI animation layer can read it after simulateTick returns.
+    req.targetReplicaId = targetId
+
     const routed: SimRequest = { ...req }
     routed.targetReplicaId = targetId
     routed.routedTime = tick

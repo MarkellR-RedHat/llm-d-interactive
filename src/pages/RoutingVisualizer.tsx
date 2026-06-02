@@ -178,10 +178,12 @@ function StatCard({
   label,
   value,
   unit,
+  description,
 }: {
   label: string
   value: string
   unit: string
+  description?: string
 }) {
   return (
     <div
@@ -220,6 +222,19 @@ function StatCard({
       >
         {label}
       </div>
+      {description && (
+        <div
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '11px',
+            lineHeight: '16px',
+            color: GRAY_400,
+            marginTop: '8px',
+          }}
+        >
+          {description}
+        </div>
+      )}
     </div>
   )
 }
@@ -341,7 +356,7 @@ function ReplicaNodeCard({
 export default function RoutingVisualizer() {
   /* ---- simulation state ---- */
   const [simState, setSimState] = useState<SimState>(() =>
-    createInitialState(6, 'round-robin'),
+    createInitialState(4, 'round-robin'),
   )
   const simRef = useRef(simState)
   simRef.current = simState
@@ -360,7 +375,7 @@ export default function RoutingVisualizer() {
   /* ---- reset handler ---- */
   const handleReset = useCallback(() => {
     resetRequestCounter()
-    const fresh = createInitialState(6, policy)
+    const fresh = createInitialState(4, policy)
     setSimState(fresh)
     simRef.current = fresh
     setDots([])
@@ -373,7 +388,7 @@ export default function RoutingVisualizer() {
     setPolicy(p)
     // Reset with the new policy so routing behavior changes immediately
     resetRequestCounter()
-    const fresh = createInitialState(6, p)
+    const fresh = createInitialState(4, p)
     setSimState(fresh)
     simRef.current = fresh
     setDots([])
@@ -534,6 +549,84 @@ export default function RoutingVisualizer() {
           </div>
         </div>
 
+        {/* ---- Intro / How to Use ---- */}
+        <div
+          style={{
+            maxWidth: '1244px',
+            margin: '0 auto',
+            padding: '32px 30px 0',
+          }}
+        >
+          <div
+            style={{
+              padding: '28px 32px',
+              backgroundColor: PURPLE_LIGHT,
+              borderRadius: '8px',
+              border: `1px solid ${GRAY_200}`,
+              marginBottom: '24px',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '16px',
+                lineHeight: '28px',
+                color: GRAY_600,
+                margin: '0 0 20px 0',
+                maxWidth: '900px',
+              }}
+            >
+              This simulation models how an llm&#x2011;d cluster routes incoming
+              requests to replica workers. Each colored dot is a request. Green
+              dots mean the request was routed to a replica that already had the
+              relevant data cached (a cache hit), which makes it much faster.
+              Grey dots mean no cache was available (a cache miss). Try switching
+              between routing policies to see how the distribution and
+              performance change.
+            </p>
+            <div
+              style={{
+                fontFamily: 'var(--font-display)',
+                fontWeight: 700,
+                fontSize: '13px',
+                color: BLACK,
+                textTransform: 'uppercase',
+                letterSpacing: '0.04em',
+                marginBottom: '10px',
+              }}
+            >
+              How to use this
+            </div>
+            <ul
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '14px',
+                lineHeight: '24px',
+                color: GRAY_600,
+                margin: 0,
+                paddingLeft: '20px',
+              }}
+            >
+              <li>
+                Switch routing policies using the buttons to see different
+                distribution strategies
+              </li>
+              <li>
+                Click "Burst Traffic" to flood the cluster and see how each
+                policy handles overload
+              </li>
+              <li>
+                Click "Kill Node" to simulate a replica failure and watch
+                requests redistribute
+              </li>
+              <li>
+                Watch the metrics below update in real time as the simulation
+                runs
+              </li>
+            </ul>
+          </div>
+        </div>
+
         {/* ---- Controls bar (sticky) ---- */}
         <div
           style={{
@@ -643,143 +736,15 @@ export default function RoutingVisualizer() {
           <div
             style={{
               position: 'relative',
-              height: '500px',
+              minHeight: '360px',
               backgroundColor: GRAY_50,
               borderRadius: '8px',
               border: `1px solid ${GRAY_200}`,
-              overflow: 'hidden',
+              overflow: 'visible',
               marginBottom: '40px',
+              padding: '48px 24px 48px',
             }}
           >
-            {/* Router box (left side) */}
-            <div
-              style={{
-                position: 'absolute',
-                left: '30px',
-                top: '50%',
-                transform: 'translateY(-50%)',
-                width: '140px',
-                padding: '24px 16px',
-                backgroundColor: PURPLE,
-                borderRadius: '8px',
-                textAlign: 'center',
-                boxShadow: '0 4px 16px rgba(155,77,155,0.3)',
-                zIndex: 10,
-              }}
-            >
-              <div
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontWeight: 700,
-                  fontSize: '14px',
-                  color: '#fff',
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.06em',
-                  marginBottom: '8px',
-                }}
-              >
-                Router
-              </div>
-              <div
-                style={{
-                  fontFamily: 'var(--font-mono)',
-                  fontSize: '10px',
-                  color: 'rgba(255,255,255,0.8)',
-                  lineHeight: '16px',
-                }}
-              >
-                {explanation.title}
-              </div>
-              {/* Pulse ring */}
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '-4px',
-                  left: '-4px',
-                  right: '-4px',
-                  bottom: '-4px',
-                  borderRadius: '12px',
-                  border: `2px solid ${PURPLE}`,
-                  opacity: 0.3,
-                  animation: 'routerPulse 2s ease-in-out infinite',
-                }}
-              />
-            </div>
-
-            {/* Replica nodes (right side) */}
-            <div
-              style={{
-                position: 'absolute',
-                right: '30px',
-                top: '20px',
-                bottom: '20px',
-                width: '110px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: '8px',
-                justifyContent: 'center',
-                zIndex: 10,
-              }}
-            >
-              {replicas.map((r) => (
-                <ReplicaNodeCard
-                  key={r.id}
-                  name={r.name}
-                  active={r.active}
-                  queueDepth={r.queueDepth}
-                  activeRequests={r.activeRequests}
-                  kvCacheUtil={r.kvCacheUtilization}
-                />
-              ))}
-            </div>
-
-            {/* Animated request dots */}
-            {dots.map((dot) => {
-              // Router center position (percentage-based)
-              const startXPct = 15
-              const endXPct = 82
-
-              // Target replica vertical position
-              const replicaCount = replicas.length
-              const replicaIdx = Math.max(
-                0,
-                Math.min(dot.targetReplica, replicaCount - 1),
-              )
-              const topPadPct = 4
-              const bottomPadPct = 4
-              const rangeH = 100 - topPadPct - bottomPadPct
-              const divider = replicaCount - 1 || 1
-              const targetYPct =
-                topPadPct +
-                (rangeH / divider) * replicaIdx +
-                (rangeH / divider) * 0.35
-
-              const startY = 50 // center
-              const currentX = startXPct + (endXPct - startXPct) * dot.progress
-              const currentY = startY + (targetYPct - startY) * dot.progress
-
-              return (
-                <div
-                  key={dot.id}
-                  style={{
-                    position: 'absolute',
-                    left: `${currentX}%`,
-                    top: `${currentY}%`,
-                    width: '10px',
-                    height: '10px',
-                    borderRadius: '50%',
-                    backgroundColor: dot.cacheHit ? '#51cf66' : GRAY_400,
-                    boxShadow: dot.cacheHit
-                      ? '0 0 8px rgba(81,207,102,0.6)'
-                      : '0 0 4px rgba(0,0,0,0.2)',
-                    transform: 'translate(-50%, -50%)',
-                    pointerEvents: 'none',
-                    zIndex: 5,
-                  }}
-                />
-              )
-            })}
-
             {/* Status overlay */}
             <div
               style={{
@@ -789,6 +754,7 @@ export default function RoutingVisualizer() {
                 display: 'flex',
                 gap: '8px',
                 zIndex: 20,
+                flexWrap: 'wrap',
               }}
             >
               <div
@@ -849,14 +815,167 @@ export default function RoutingVisualizer() {
               )}
             </div>
 
+            {/* Router + Replicas layout container */}
+            <div
+              className="viz-layout"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '24px',
+                position: 'relative',
+                minHeight: '260px',
+              }}
+            >
+              {/* Router box */}
+              <div
+                style={{
+                  width: '130px',
+                  minWidth: '130px',
+                  padding: '20px 14px',
+                  backgroundColor: PURPLE,
+                  borderRadius: '8px',
+                  textAlign: 'center',
+                  boxShadow: '0 4px 16px rgba(155,77,155,0.3)',
+                  zIndex: 10,
+                  position: 'relative',
+                  flexShrink: 0,
+                }}
+              >
+                <div
+                  style={{
+                    fontFamily: 'var(--font-display)',
+                    fontWeight: 700,
+                    fontSize: '14px',
+                    color: '#fff',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.06em',
+                    marginBottom: '8px',
+                  }}
+                >
+                  Router
+                </div>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-mono)',
+                    fontSize: '10px',
+                    color: 'rgba(255,255,255,0.8)',
+                    lineHeight: '16px',
+                  }}
+                >
+                  {explanation.title}
+                </div>
+                {/* Pulse ring */}
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '-4px',
+                    left: '-4px',
+                    right: '-4px',
+                    bottom: '-4px',
+                    borderRadius: '12px',
+                    border: `2px solid ${PURPLE}`,
+                    opacity: 0.3,
+                    animation: 'routerPulse 2s ease-in-out infinite',
+                  }}
+                />
+              </div>
+
+              {/* Dot animation area (fills the gap between router and replicas) */}
+              <div
+                className="viz-dot-area"
+                style={{
+                  flex: 1,
+                  position: 'relative',
+                  minHeight: '260px',
+                  alignSelf: 'stretch',
+                }}
+              >
+                {dots.map((dot) => {
+                  // Compute which replica index this dot targets.
+                  // dot.targetReplica holds the replica *id* (0-based).
+                  // We need to find the visual index within the current
+                  // replicas array so the dot flies to the correct card.
+                  const replicaCount = replicas.length
+                  const visualIdx = replicas.findIndex(
+                    (r) => r.id === dot.targetReplica,
+                  )
+                  const replicaIdx = Math.max(
+                    0,
+                    Math.min(
+                      visualIdx >= 0 ? visualIdx : 0,
+                      replicaCount - 1,
+                    ),
+                  )
+
+                  // Y position: distribute evenly across the height
+                  const topPadPct = 8
+                  const rangeH = 100 - topPadPct * 2
+                  const slotHeight = rangeH / replicaCount
+                  const targetYPct =
+                    topPadPct + slotHeight * replicaIdx + slotHeight * 0.5
+
+                  const startY = 50
+                  const currentX = dot.progress * 100
+                  const currentY =
+                    startY + (targetYPct - startY) * dot.progress
+
+                  return (
+                    <div
+                      key={dot.id}
+                      style={{
+                        position: 'absolute',
+                        left: `${currentX}%`,
+                        top: `${currentY}%`,
+                        width: '10px',
+                        height: '10px',
+                        borderRadius: '50%',
+                        backgroundColor: dot.cacheHit
+                          ? '#51cf66'
+                          : GRAY_400,
+                        boxShadow: dot.cacheHit
+                          ? '0 0 8px rgba(81,207,102,0.6)'
+                          : '0 0 4px rgba(0,0,0,0.2)',
+                        transform: 'translate(-50%, -50%)',
+                        pointerEvents: 'none',
+                        zIndex: 5,
+                      }}
+                    />
+                  )
+                })}
+              </div>
+
+              {/* Replica nodes */}
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '10px',
+                  width: '120px',
+                  minWidth: '120px',
+                  flexShrink: 0,
+                  zIndex: 10,
+                }}
+              >
+                {replicas.map((r) => (
+                  <ReplicaNodeCard
+                    key={r.id}
+                    name={r.name}
+                    active={r.active}
+                    queueDepth={r.queueDepth}
+                    activeRequests={r.activeRequests}
+                    kvCacheUtil={r.kvCacheUtilization}
+                  />
+                ))}
+              </div>
+            </div>
+
             {/* Legend */}
             <div
               style={{
-                position: 'absolute',
-                bottom: '12px',
-                left: '12px',
                 display: 'flex',
                 gap: '16px',
+                marginTop: '16px',
                 zIndex: 20,
               }}
             >
@@ -919,21 +1038,25 @@ export default function RoutingVisualizer() {
               label="Throughput"
               value={metrics.throughputRPS.toFixed(1)}
               unit="req/s"
+              description="Requests completed per second"
             />
             <StatCard
               label="Avg Latency"
               value={String(Math.round(metrics.avgLatencyMs))}
               unit="ms"
+              description="Average time from request arrival to completion (milliseconds)"
             />
             <StatCard
               label="Cache Hit Rate"
               value={String(Math.round(metrics.cacheHitRate * 100))}
               unit="%"
+              description="Percentage of requests routed to a replica that already had the relevant prefix cached, avoiding redundant computation"
             />
             <StatCard
               label="P99 Latency"
               value={String(Math.round(metrics.p99LatencyMs))}
               unit="ms"
+              description="99th percentile latency. 99% of requests complete faster than this. High P99 means some requests are much slower than average."
             />
           </div>
 
@@ -991,11 +1114,20 @@ export default function RoutingVisualizer() {
         </div>
       </div>
 
-      {/* CSS keyframes for router pulse */}
+      {/* CSS keyframes for router pulse + responsive layout */}
       <style>{`
         @keyframes routerPulse {
           0%, 100% { transform: scale(1); opacity: 0.3; }
           50% { transform: scale(1.06); opacity: 0.15; }
+        }
+        @media (max-width: 640px) {
+          .viz-layout {
+            flex-direction: column !important;
+            align-items: stretch !important;
+          }
+          .viz-dot-area {
+            min-height: 80px !important;
+          }
         }
       `}</style>
     </PageTransition>
