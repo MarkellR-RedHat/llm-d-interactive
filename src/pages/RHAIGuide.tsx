@@ -236,7 +236,7 @@ export default function RHAIGuide() {
           </div>
         </div>
 
-        {/* ── Prerequisites ── */}
+        {/* ── Internal access notice ── */}
         <div
           style={{
             maxWidth: '1244px',
@@ -244,6 +244,47 @@ export default function RHAIGuide() {
             padding: '32px 30px 0',
           }}
         >
+          <div
+            style={{
+              backgroundColor: '#FFF8E1',
+              border: '1px solid #FFE082',
+              borderRadius: '6px',
+              padding: '20px 28px',
+              marginBottom: '24px',
+              maxWidth: '900px',
+            }}
+          >
+            <p
+              style={{
+                fontFamily: 'var(--font-body)',
+                fontSize: '15px',
+                lineHeight: '24px',
+                color: '#5D4037',
+                margin: 0,
+              }}
+            >
+              <strong>Red Hat internal guide.</strong> This walkthrough uses the
+              Red Hat Demo Platform (demo.redhat.com), which is available to Red Hat
+              employees and authorized partners. If you are a community user or
+              customer without RHDP access, you can deploy {`llm${NBSP_HYPHEN}d`} on
+              any Kubernetes cluster with GPUs using the{' '}
+              <a
+                href="https://github.com/llm-d/llm-d/tree/main/guides/optimized-baseline"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ color: PURPLE, fontWeight: 600 }}
+              >
+                open source guides on GitHub
+              </a>
+              , or try the{' '}
+              <Link to="/configurator" style={{ color: PURPLE, fontWeight: 600 }}>
+                Deployment Configurator
+              </Link>{' '}
+              to generate configs for your own cluster.
+            </p>
+          </div>
+
+          {/* ── Prerequisites ── */}
           <div
             style={{
               backgroundColor: PURPLE_LIGHT,
@@ -277,7 +318,7 @@ export default function RHAIGuide() {
               }}
             >
               <li>A Red Hat SSO account (your @redhat.com login)</li>
-              <li>Access to RHPDS (demo.redhat.com)</li>
+              <li>Access to the Red Hat Demo Platform (demo.redhat.com)</li>
               <li>A web browser</li>
               <li>
                 About 45 minutes for the first time (15 minutes for subsequent
@@ -294,8 +335,10 @@ export default function RHAIGuide() {
                 marginBottom: 0,
               }}
             >
-              <strong>Note:</strong> If you do not have RHPDS access, ask your manager
-              or a Solutions Architect on your team.
+              <strong>Which catalog item to order:</strong> In the RHDP catalog, search
+              for and order{' '}
+              <strong>"RHOAI on OCP on AWS with NVIDIA GPUs"</strong>. This gives you
+              an OpenShift cluster with OpenShift AI and NVIDIA GPUs pre-configured.
             </p>
           </div>
         </div>
