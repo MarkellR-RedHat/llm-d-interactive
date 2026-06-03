@@ -20,6 +20,7 @@ const navItems = [
       { label: 'Architecture Explorer', path: '/architecture', desc: 'Interactive component diagram' },
       { label: 'Migration Guide', path: '/migration', desc: 'Coming from vLLM, TGI, or Triton' },
       { label: 'Troubleshooting', path: '/troubleshooting', desc: 'Diagnose and fix common issues' },
+      { label: 'RHAI Deployment Guide', path: '/rhai-guide', desc: 'Deploy llm-d on OpenShift step by step' },
     ],
   },
   { label: 'Notebooks', path: '/notebooks' },

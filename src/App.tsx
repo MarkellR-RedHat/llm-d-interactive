@@ -10,6 +10,7 @@ import Architecture from './pages/Architecture'
 import MigrationGuide from './pages/MigrationGuide'
 import Troubleshooting from './pages/Troubleshooting'
 import Notebooks from './pages/Notebooks'
+import RHAIGuide from './pages/RHAIGuide'
 
 function App() {
   const location = useLocation()
@@ -27,6 +28,7 @@ function App() {
           <Route path="/migration" element={<MigrationGuide />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/notebooks" element={<Notebooks />} />
+          <Route path="/rhai-guide" element={<RHAIGuide />} />
         </Routes>
       </AnimatePresence>
     </Layout>
