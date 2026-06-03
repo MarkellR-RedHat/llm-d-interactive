@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
 import { Check, Copy, CheckCircle2 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import PageTransition from '../components/shared/PageTransition'
@@ -17,26 +17,6 @@ const GRAY_100 = '#E0E0E0'
 const GRAY_50 = '#F0F0F0'
 
 const NBSP_HYPHEN = '‑' // non-breaking hyphen
-
-/* ------------------------------------------------------------------ */
-/*  Step data                                                          */
-/* ------------------------------------------------------------------ */
-
-interface StepDef {
-  number: string
-  title: string
-}
-
-const steps: StepDef[] = [
-  { number: '01', title: 'Access RHPDS' },
-  { number: '02', title: 'Provision a Cluster' },
-  { number: '03', title: 'Install the oc CLI' },
-  { number: '04', title: 'Log In to Your Cluster' },
-  { number: '05', title: 'Install Required Operators' },
-  { number: '06', title: 'Deploy llm‑d' },
-  { number: '07', title: 'Test Your Deployment' },
-  { number: '08', title: 'Clean Up' },
-]
 
 /* ------------------------------------------------------------------ */
 /*  Code Block helper                                                  */
@@ -120,21 +100,16 @@ function Code({ children }: { children: React.ReactNode }) {
 /* ------------------------------------------------------------------ */
 
 function StepSection({
-  stepIndex,
-  stepRef,
+  number,
+  title,
   children,
 }: {
-  stepIndex: number
-  stepRef: (el: HTMLDivElement | null) => void
+  number: string
+  title: string
   children: React.ReactNode
 }) {
-  const step = steps[stepIndex]
   return (
-    <div
-      ref={stepRef}
-      id={`step-${stepIndex}`}
-      style={{ marginBottom: '64px', scrollMarginTop: '160px' }}
-    >
+    <div style={{ marginBottom: '64px' }}>
       <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px', marginBottom: '24px' }}>
         <span
           style={{
@@ -148,7 +123,7 @@ function StepSection({
             userSelect: 'none',
           }}
         >
-          {step.number}
+          {number}
         </span>
         <h2
           style={{
@@ -161,7 +136,7 @@ function StepSection({
             paddingTop: '6px',
           }}
         >
-          {step.title}
+          {title}
         </h2>
       </div>
       <div
@@ -180,189 +155,11 @@ function StepSection({
 }
 
 /* ------------------------------------------------------------------ */
-/*  Progress Tracker (sidebar on desktop, horizontal on mobile)        */
-/* ------------------------------------------------------------------ */
-
-function ProgressTracker({
-  activeStep,
-  completedSteps,
-  onStepClick,
-}: {
-  activeStep: number
-  completedSteps: Set<number>
-  onStepClick: (idx: number) => void
-}) {
-  return (
-    <>
-      {/* Desktop: vertical sidebar */}
-      <nav
-        className="hidden lg:block"
-        style={{
-          position: 'sticky',
-          top: '140px',
-          width: '220px',
-          flexShrink: 0,
-          alignSelf: 'flex-start',
-        }}
-      >
-        <div
-          style={{
-            fontFamily: 'var(--font-display)',
-            fontSize: '12px',
-            fontWeight: 700,
-            textTransform: 'uppercase',
-            letterSpacing: '0.08em',
-            color: '#8A8D90',
-            marginBottom: '16px',
-            paddingLeft: '12px',
-          }}
-        >
-          Progress
-        </div>
-        {steps.map((step, idx) => {
-          const isCompleted = completedSteps.has(idx)
-          const isActive = activeStep === idx
-          return (
-            <button
-              key={idx}
-              onClick={() => onStepClick(idx)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '10px',
-                width: '100%',
-                padding: '10px 12px',
-                backgroundColor: isActive ? PURPLE_LIGHT : 'transparent',
-                border: 'none',
-                borderLeft: isActive ? `3px solid ${PURPLE}` : '3px solid transparent',
-                cursor: 'pointer',
-                textAlign: 'left',
-                transition: 'all 0.2s ease',
-                borderRadius: '0 4px 4px 0',
-              }}
-            >
-              <span
-                style={{
-                  width: '22px',
-                  height: '22px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  flexShrink: 0,
-                  backgroundColor: isCompleted ? PURPLE : isActive ? PURPLE : GRAY_100,
-                  color: isCompleted || isActive ? '#fff' : '#8A8D90',
-                  fontSize: '11px',
-                  fontWeight: 700,
-                  fontFamily: 'var(--font-display)',
-                }}
-              >
-                {isCompleted ? (
-                  <Check style={{ width: '12px', height: '12px' }} />
-                ) : (
-                  step.number
-                )}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '13px',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? PURPLE_DARK : isCompleted ? PURPLE : GRAY_600,
-                  lineHeight: '18px',
-                }}
-              >
-                {step.title}
-              </span>
-            </button>
-          )
-        })}
-      </nav>
-
-      {/* Mobile: horizontal scrollable bar */}
-      <nav
-        className="lg:hidden"
-        style={{
-          position: 'sticky',
-          top: '90px',
-          zIndex: 50,
-          backgroundColor: '#fff',
-          borderBottom: `1px solid ${GRAY_100}`,
-          padding: '12px 0',
-          marginBottom: '24px',
-          overflowX: 'auto',
-          display: 'flex',
-          gap: '6px',
-          WebkitOverflowScrolling: 'touch',
-        }}
-      >
-        {steps.map((step, idx) => {
-          const isCompleted = completedSteps.has(idx)
-          const isActive = activeStep === idx
-          return (
-            <button
-              key={idx}
-              onClick={() => onStepClick(idx)}
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 12px',
-                backgroundColor: isActive ? PURPLE_LIGHT : 'transparent',
-                border: isActive ? `1px solid ${PURPLE}` : `1px solid ${GRAY_100}`,
-                borderRadius: '20px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-              }}
-            >
-              <span
-                style={{
-                  width: '18px',
-                  height: '18px',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  backgroundColor: isCompleted ? PURPLE : isActive ? PURPLE : GRAY_100,
-                  color: isCompleted || isActive ? '#fff' : '#8A8D90',
-                  fontSize: '10px',
-                  fontWeight: 700,
-                  fontFamily: 'var(--font-display)',
-                }}
-              >
-                {isCompleted ? (
-                  <Check style={{ width: '10px', height: '10px' }} />
-                ) : (
-                  step.number
-                )}
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-display)',
-                  fontSize: '12px',
-                  fontWeight: isActive ? 700 : 500,
-                  color: isActive ? PURPLE_DARK : GRAY_600,
-                }}
-              >
-                {step.title}
-              </span>
-            </button>
-          )
-        })}
-      </nav>
-    </>
-  )
-}
-
-/* ------------------------------------------------------------------ */
 /*  Main Page                                                          */
 /* ------------------------------------------------------------------ */
 
 export default function RHAIGuide() {
-  const [activeStep, setActiveStep] = useState(0)
   const [completedSteps, setCompletedSteps] = useState<Set<number>>(new Set())
-  const stepRefs = useRef<(HTMLDivElement | null)[]>([])
 
   const toggleComplete = (idx: number) => {
     setCompletedSteps((prev) => {
@@ -374,45 +171,6 @@ export default function RHAIGuide() {
       }
       return next
     })
-  }
-
-  const scrollToStep = (idx: number) => {
-    const el = stepRefs.current[idx]
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
-  }
-
-  // Track active step based on scroll position
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            const idx = stepRefs.current.indexOf(entry.target as HTMLDivElement)
-            if (idx !== -1) {
-              setActiveStep(idx)
-            }
-          }
-        }
-      },
-      { rootMargin: '-160px 0px -60% 0px', threshold: 0.1 }
-    )
-
-    const refs = stepRefs.current
-    refs.forEach((ref) => {
-      if (ref) observer.observe(ref)
-    })
-
-    return () => {
-      refs.forEach((ref) => {
-        if (ref) observer.unobserve(ref)
-      })
-    }
-  }, [])
-
-  const setStepRef = (idx: number) => (el: HTMLDivElement | null) => {
-    stepRefs.current[idx] = el
   }
 
   return (
@@ -542,26 +300,17 @@ export default function RHAIGuide() {
           </div>
         </div>
 
-        {/* ── Main content: sidebar + steps ── */}
+        {/* ── Main content ── */}
         <div
           style={{
             maxWidth: '1244px',
             margin: '0 auto',
             padding: '0 30px 80px',
-            display: 'flex',
-            gap: '48px',
-            alignItems: 'flex-start',
           }}
         >
-          <ProgressTracker
-            activeStep={activeStep}
-            completedSteps={completedSteps}
-            onStepClick={scrollToStep}
-          />
-
-          <div style={{ flex: 1, minWidth: 0, maxWidth: '820px' }}>
+          <div style={{ maxWidth: '820px' }}>
             {/* ── Step 1: Access RHPDS ── */}
-            <StepSection stepIndex={0} stepRef={setStepRef(0)}>
+            <StepSection number="01" title="Access RHPDS">
               <ol style={{ paddingLeft: '20px', margin: '0 0 16px' }}>
                 <li style={{ marginBottom: '10px' }}>
                   Go to{' '}
@@ -613,7 +362,7 @@ export default function RHAIGuide() {
             </StepSection>
 
             {/* ── Step 2: Provision a Cluster ── */}
-            <StepSection stepIndex={1} stepRef={setStepRef(1)}>
+            <StepSection number="02" title="Provision a Cluster">
               <ol style={{ paddingLeft: '20px', margin: '0 0 16px' }}>
                 <li style={{ marginBottom: '10px' }}>
                   In the RHPDS catalog, search for <strong>"OpenShift"</strong> or{' '}
@@ -681,7 +430,7 @@ export default function RHAIGuide() {
             </StepSection>
 
             {/* ── Step 3: Install the oc CLI ── */}
-            <StepSection stepIndex={2} stepRef={setStepRef(2)}>
+            <StepSection number="03" title="Install the oc CLI">
               <p style={{ marginBottom: '12px' }}>
                 The <Code>oc</Code> command is the OpenShift CLI (like{' '}
                 <Code>kubectl</Code> but with OpenShift-specific features).
@@ -728,7 +477,7 @@ oc version`}</CodeBlock>
             </StepSection>
 
             {/* ── Step 4: Log In to Your Cluster ── */}
-            <StepSection stepIndex={3} stepRef={setStepRef(3)}>
+            <StepSection number="04" title="Log In to Your Cluster">
               <ol style={{ paddingLeft: '20px', margin: '0 0 16px' }}>
                 <li style={{ marginBottom: '10px' }}>Open a terminal.</li>
                 <li style={{ marginBottom: '10px' }}>
@@ -779,7 +528,7 @@ oc version`}</CodeBlock>
             </StepSection>
 
             {/* ── Step 5: Install Required Operators ── */}
-            <StepSection stepIndex={4} stepRef={setStepRef(4)}>
+            <StepSection number="05" title="Install Required Operators">
               <p style={{ marginBottom: '16px' }}>
                 This step uses the OpenShift web console (browser-based, not CLI).
               </p>
@@ -902,7 +651,7 @@ oc describe node <gpu-node-name> | grep nvidia`}</CodeBlock>
             </StepSection>
 
             {/* ── Step 6: Deploy llm-d ── */}
-            <StepSection stepIndex={5} stepRef={setStepRef(5)}>
+            <StepSection number="06" title={`Deploy llm${NBSP_HYPHEN}d`}>
               <p style={{ marginBottom: '16px' }}>
                 Now we deploy the actual llm{NBSP_HYPHEN}d stack. This follows the
                 Optimized Baseline well-lit path.
@@ -965,7 +714,7 @@ oc get pods -n $NAMESPACE -w`}</CodeBlock>
             </StepSection>
 
             {/* ── Step 7: Test Your Deployment ── */}
-            <StepSection stepIndex={6} stepRef={setStepRef(6)}>
+            <StepSection number="07" title="Test Your Deployment">
               <p style={{ marginBottom: '8px' }}>
                 Expose the gateway via an OpenShift Route and send a test request:
               </p>
@@ -1016,7 +765,7 @@ curl -k -X POST https://$ROUTE/v1/chat/completions \\
             </StepSection>
 
             {/* ── Step 8: Clean Up ── */}
-            <StepSection stepIndex={7} stepRef={setStepRef(7)}>
+            <StepSection number="08" title="Clean Up">
               <CodeBlock>{`# Delete all llm-d resources
 oc delete project llm-d
 
