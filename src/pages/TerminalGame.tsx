@@ -170,8 +170,10 @@ export default function TerminalGame() {
       }
       let i = 0
       const interval = setInterval(() => {
-        setHistory((prev) => [...prev, lines[i]])
-        i++
+        if (i < lines.length && lines[i]) {
+          setHistory((prev) => [...prev, lines[i]])
+          i++
+        }
         if (i >= lines.length) {
           clearInterval(interval)
           onComplete?.()
@@ -230,6 +232,7 @@ export default function TerminalGame() {
   /* ---- process a command ---- */
   const processCommand = useCallback(
     (cmd: string) => {
+      try {
       const trimmed = cmd.trim()
       if (!trimmed) return
       if (isProcessing) return
@@ -333,6 +336,14 @@ export default function TerminalGame() {
         ...prev,
         { type: 'error', text: "Command not recognized. Type 'help' for available commands." },
       ])
+      } catch (err) {
+        console.error('Terminal command error:', err)
+        setHistory((prev) => [
+          ...prev,
+          { type: 'error', text: 'An error occurred processing that command. Try again.' },
+        ])
+        setIsProcessing(false)
+      }
     },
     [isProcessing, step, allComplete, selectedModel, addLinesWithDelay, advanceStep, resetHintTimers]
   )

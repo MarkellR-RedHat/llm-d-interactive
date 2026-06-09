@@ -836,7 +836,7 @@ function AdvancedTab() {
           Go deeper with our end-to-end architecture walkthrough covering every component in detail.
         </p>
         <a
-          href="/llm-d-interactive/architecture/deep-dive"
+          href="#/architecture/deep-dive"
           style={{
             display: 'inline-block',
             backgroundColor: '#9b4d9b',

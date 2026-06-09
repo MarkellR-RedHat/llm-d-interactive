@@ -225,8 +225,8 @@ interface LineDef {
   to: string
 }
 
-const DIAGRAM_W = 760
-const DIAGRAM_H = 600
+const DIAGRAM_W = 800
+const DIAGRAM_H = 620
 
 const BOXES: BoxDef[] = [
   // Layer 1 - Client
@@ -236,19 +236,19 @@ const BOXES: BoxDef[] = [
   // Layer 3 - EPP (prominent)
   { id: 'epp', label: 'Endpoint Picker', sublabel: 'llm‑d Router', x: 240, y: 180, w: 260, h: 56, accent: true },
   // Layer 4 - Workers (2 per group)
-  { id: 'prefill', label: 'Prefill Worker 1', x: 100, y: 296, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'prefill-2', label: 'Prefill Worker 2', x: 100, y: 346, w: 140, h: 40, group: 'prefill-group' },
-  { id: 'decode', label: 'Decode Worker 1', x: 500, y: 296, w: 140, h: 40, group: 'decode-group' },
-  { id: 'decode-2', label: 'Decode Worker 2', x: 500, y: 346, w: 140, h: 40, group: 'decode-group' },
+  { id: 'prefill', label: 'Prefill Worker 1', x: 80, y: 296, w: 160, h: 44, group: 'prefill-group' },
+  { id: 'prefill-2', label: 'Prefill Worker 2', x: 80, y: 350, w: 160, h: 44, group: 'prefill-group' },
+  { id: 'decode', label: 'Decode Worker 1', x: 500, y: 296, w: 160, h: 44, group: 'decode-group' },
+  { id: 'decode-2', label: 'Decode Worker 2', x: 500, y: 350, w: 160, h: 44, group: 'decode-group' },
   // Layer 5 - KV Cache
-  { id: 'kv-gpu', label: 'GPU HBM', x: 110, y: 450, w: 150, h: 42 },
-  { id: 'kv-cpu', label: 'CPU DRAM', x: 295, y: 450, w: 150, h: 42 },
-  { id: 'kv-disk', label: 'Disk / NVMe', x: 480, y: 450, w: 150, h: 42 },
-  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 295, y: 520, w: 150, h: 42 },
+  { id: 'kv-gpu', label: 'GPU HBM', x: 100, y: 460, w: 160, h: 44 },
+  { id: 'kv-cpu', label: 'CPU DRAM', x: 290, y: 460, w: 160, h: 44 },
+  { id: 'kv-disk', label: 'Disk / NVMe', x: 480, y: 460, w: 160, h: 44 },
+  { id: 'kv-indexer', label: 'KV Cache Indexer', x: 280, y: 530, w: 180, h: 44 },
   // Side components (with breathing room from edges)
-  { id: 'autoscaler', label: 'Autoscaler', x: 20, y: 200, w: 120, h: 44 },
-  { id: 'latency-predictor', label: 'Latency Predictor', x: 600, y: 180, w: 140, h: 44 },
-  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 600, y: 236, w: 140, h: 44 },
+  { id: 'autoscaler', label: 'Autoscaler', x: 10, y: 200, w: 130, h: 44 },
+  { id: 'latency-predictor', label: 'Latency Predictor', x: 610, y: 180, w: 170, h: 44 },
+  { id: 'inference-pool', label: 'InferencePool', sublabel: 'K8s CRD', x: 610, y: 240, w: 170, h: 48 },
 ]
 
 const LINES: LineDef[] = [
@@ -851,7 +851,7 @@ export default function Architecture() {
             and what happens when it fails.
           </p>
           <a
-            href="/llm-d-interactive/architecture/deep-dive"
+            href="#/architecture/deep-dive"
             style={{
               display: 'inline-block',
               backgroundColor: PURPLE_LIGHT,
