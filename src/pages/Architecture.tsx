@@ -499,7 +499,8 @@ function ComponentBox({
             ? '0 4px 12px rgba(0,0,0,0.08)'
             : '0 1px 4px rgba(0,0,0,0.04)',
         zIndex: isSelected || hovered ? 10 : 1,
-        padding: '4px 8px',
+        padding: '6px 10px',
+        overflow: 'hidden',
         transition: 'box-shadow 0.2s ease',
       }}
     >
@@ -507,10 +508,14 @@ function ComponentBox({
         style={{
           fontFamily: 'var(--font-display)',
           fontWeight: 700,
-          fontSize: box.accent ? '14px' : '12px',
+          fontSize: box.accent ? '13px' : '11px',
           color: isSelected ? PURPLE_DARK : BLACK,
           lineHeight: 1.2,
           textAlign: 'center',
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          maxWidth: '100%',
         }}
       >
         {box.label}
@@ -845,6 +850,24 @@ export default function Architecture() {
             Click any component to learn what it does, how to configure it,
             and what happens when it fails.
           </p>
+          <a
+            href="/llm-d-interactive/architecture/deep-dive"
+            style={{
+              display: 'inline-block',
+              backgroundColor: PURPLE_LIGHT,
+              color: PURPLE_DARK,
+              padding: '10px 20px',
+              borderRadius: '4px',
+              fontFamily: 'var(--font-body)',
+              fontWeight: 600,
+              fontSize: '14px',
+              textDecoration: 'none',
+              marginBottom: '32px',
+              border: `1px solid ${PURPLE}`,
+            }}
+          >
+            Want the full technical walkthrough? See the Architecture Deep Dive →
+          </a>
 
           {/* Main content: diagram + detail panel */}
           <div

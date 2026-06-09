@@ -11,6 +11,8 @@ import MigrationGuide from './pages/MigrationGuide'
 import Troubleshooting from './pages/Troubleshooting'
 import Notebooks from './pages/Notebooks'
 import RHAIGuide from './pages/RHAIGuide'
+import ArchitectureDeepDive from './pages/ArchitectureDeepDive'
+import TerminalGame from './pages/TerminalGame'
 
 function App() {
   const location = useLocation()
@@ -25,10 +27,12 @@ function App() {
           <Route path="/routing" element={<RoutingVisualizer />} />
           <Route path="/capacity" element={<CapacityPlanner />} />
           <Route path="/architecture" element={<Architecture />} />
+          <Route path="/architecture/deep-dive" element={<ArchitectureDeepDive />} />
           <Route path="/migration" element={<MigrationGuide />} />
           <Route path="/troubleshooting" element={<Troubleshooting />} />
           <Route path="/notebooks" element={<Notebooks />} />
           <Route path="/rhai-guide" element={<RHAIGuide />} />
+          <Route path="/terminal-game" element={<TerminalGame />} />
         </Routes>
       </AnimatePresence>
     </Layout>

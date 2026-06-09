@@ -12,12 +12,14 @@ const navItems = [
       { label: 'Deployment Configurator', path: '/configurator', desc: 'Walk through your deployment options' },
       { label: 'Routing Visualizer', path: '/routing', desc: 'Understand how routing policies work' },
       { label: 'Capacity Planner', path: '/capacity', desc: 'Explore resource and cost tradeoffs' },
+      { label: 'Deployment Simulator', path: '/terminal-game', desc: 'Learn to deploy llm-d in a simulated terminal' },
     ],
   },
   {
     label: 'Reference',
     children: [
       { label: 'Architecture Explorer', path: '/architecture', desc: 'Interactive component diagram' },
+      { label: 'Architecture Deep Dive', path: '/architecture/deep-dive', desc: 'End-to-end technical walkthrough' },
       { label: 'Migration Guide', path: '/migration', desc: 'Coming from vLLM, TGI, or Triton' },
       { label: 'Troubleshooting', path: '/troubleshooting', desc: 'Diagnose and fix common issues' },
       { label: 'RHAI Deployment Guide', path: '/rhai-guide', desc: 'Deploy llm-d on OpenShift step by step' },

@@ -801,6 +801,57 @@ function AdvancedTab() {
           replicas with no request loss or cache index staleness.
         </KeyConcept>
       </Section>
+
+      {/* CTA to Architecture Deep Dive */}
+      <div
+        style={{
+          backgroundColor: '#f3e8f3',
+          border: '2px solid #9b4d9b',
+          borderRadius: '8px',
+          padding: '32px',
+          textAlign: 'center',
+          marginTop: '16px',
+          marginBottom: '56px',
+        }}
+      >
+        <h3
+          style={{
+            fontFamily: 'var(--font-display)',
+            fontSize: '24px',
+            fontWeight: 700,
+            color: '#151515',
+            marginBottom: '12px',
+          }}
+        >
+          Ready for the full picture?
+        </h3>
+        <p
+          style={{
+            fontFamily: 'var(--font-body)',
+            fontSize: '18px',
+            color: '#4D4D4D',
+            marginBottom: '20px',
+          }}
+        >
+          Go deeper with our end-to-end architecture walkthrough covering every component in detail.
+        </p>
+        <a
+          href="/llm-d-interactive/architecture/deep-dive"
+          style={{
+            display: 'inline-block',
+            backgroundColor: '#9b4d9b',
+            color: '#fff',
+            padding: '12px 32px',
+            borderRadius: '4px',
+            fontFamily: 'var(--font-body)',
+            fontWeight: 700,
+            fontSize: '16px',
+            textDecoration: 'none',
+          }}
+        >
+          Architecture Deep Dive
+        </a>
+      </div>
     </div>
   )
 }
